@@ -80,11 +80,17 @@
 </head>
 <body class="bg-slate-50 text-slate-800 dark:bg-[#0B0F19] dark:text-slate-100 min-h-screen flex flex-col transition-colors duration-200">
 
+  <!-- TOAST NOTIFICATION CONTAINER -->
+  <div id="toast" class="fixed bottom-5 right-5 z-50 transform translate-y-16 opacity-0 transition-all duration-300 pointer-events-none flex items-center space-x-2.5 px-4 py-3 rounded-xl bg-slate-900 text-white dark:bg-white dark:text-slate-900 shadow-xl border border-slate-700/50 text-xs font-semibold">
+    <i id="toast-icon" class="fa-solid fa-circle-check text-emerald-400 dark:text-emerald-600"></i>
+    <span id="toast-msg">Notification message</span>
+  </div>
+
   <!-- TOP APP BAR -->
   <header class="sticky top-0 z-40 bg-white/95 dark:bg-[#0E1322]/95 backdrop-blur border-b border-slate-200 dark:border-slate-800/80 px-4 lg:px-6 py-2.5 flex items-center justify-between">
     <!-- Brand & Workspace -->
     <div class="flex items-center space-x-4">
-      <div class="flex items-center space-x-2.5">
+      <div class="flex items-center space-x-2.5 cursor-pointer" onclick="switchTab('overview')">
         <div class="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center text-white font-bold shadow-sm shadow-blue-500/20">
           <i class="fa-solid fa-chart-line text-sm"></i>
         </div>
@@ -100,74 +106,93 @@
       </div>
     </div>
 
-    <!-- Center Search & Command Trigger -->
-    <div class="hidden sm:flex flex-1 max-w-md mx-6">
-      <button onclick="toggleCommandPalette()" class="w-full text-left flex items-center justify-between px-3 py-1.5 text-xs text-slate-500 dark:text-slate-400 bg-slate-100/80 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg hover:border-slate-300 dark:hover:border-slate-700 transition">
-        <span class="flex items-center space-x-2">
-          <i class="fa-solid fa-magnifying-glass text-slate-400"></i>
+    <!-- Center Search & Command Palette Trigger -->
+    <div class="hidden md:flex items-center flex-1 max-w-md mx-6">
+      <div onclick="toggleCommandPalette()" class="w-full flex items-center justify-between px-3 py-1.5 rounded-lg border border-slate-200 dark:border-slate-800 bg-slate-50/80 dark:bg-slate-900/60 text-slate-400 text-xs hover:border-slate-300 dark:hover:border-slate-700 cursor-pointer transition">
+        <div class="flex items-center space-x-2">
+          <i class="fa-solid fa-magnifying-glass text-[11px]"></i>
           <span id="txt-search-placeholder">Quick search users, metrics or settings...</span>
-        </span>
-        <kbd class="font-mono text-[10px] bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 px-1.5 py-0.5 rounded text-slate-500 dark:text-slate-400 shadow-sm">⌘K</kbd>
-      </button>
+        </div>
+        <kbd class="px-1.5 py-0.5 text-[10px] font-mono bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded shadow-2xs">⌘K</kbd>
+      </div>
     </div>
 
-    <!-- Actions & Selectors -->
+    <!-- Actions & Controls -->
     <div class="flex items-center space-x-2.5">
       <!-- Bilingual Switcher -->
-      <button onclick="toggleLanguage()" id="lang-btn" class="flex items-center space-x-1.5 px-2.5 py-1 text-xs font-semibold rounded-lg bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700 transition" title="Toggle Language (EN / PT)">
+      <button onclick="toggleLanguage()" id="lang-btn" class="flex items-center space-x-1.5 px-2.5 py-1 text-xs font-semibold rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 hover:bg-slate-50 dark:hover:bg-slate-800/80 transition" title="Toggle Language (EN / PT)">
         <span>🇺🇸</span>
-        <span id="lang-label">English</span>
+        <span>English</span>
       </button>
 
-      <!-- Theme Switcher -->
-      <button onclick="toggleTheme()" class="w-8 h-8 flex items-center justify-center rounded-lg bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700 transition" title="Toggle Light / Dark Mode">
+      <!-- Theme Switcher (Clean Light / Carbon Slate Dark) -->
+      <button onclick="toggleTheme()" id="theme-btn" class="p-1.5 text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 transition" title="Toggle Dark/Light Mode">
         <i id="theme-icon" class="fa-solid fa-moon text-xs"></i>
       </button>
 
-      <!-- Commercial Buy Link -->
-      <a href="https://github.com/KipTecnologia/dashcraft-pro#commercial-license" class="hidden md:inline-flex items-center space-x-1.5 px-3 py-1 text-xs font-bold text-white bg-blue-600 hover:bg-blue-700 rounded-lg shadow-sm shadow-blue-600/30 transition">
-        <i class="fa-solid fa-lock text-[11px]"></i>
+      <!-- Commercial CTA -->
+      <button onclick="openCheckoutModal()" class="flex items-center space-x-1.5 px-3 py-1 text-xs font-bold text-white bg-blue-600 hover:bg-blue-700 rounded-lg shadow-sm shadow-blue-500/20 transition">
+        <i class="fa-solid fa-shield-halved text-[11px]"></i>
         <span id="lbl-buy-top">Commercial License ($59)</span>
-      </a>
+      </button>
 
       <!-- Profile Avatar -->
-      <div class="w-8 h-8 rounded-full bg-gradient-to-tr from-slate-700 to-slate-900 border border-slate-300 dark:border-slate-700 flex items-center justify-center text-xs font-bold text-white cursor-pointer ml-1">
-        AR
+      <div onclick="switchTab('settings')" class="w-8 h-8 rounded-full bg-gradient-to-tr from-slate-700 to-slate-900 border border-slate-300 dark:border-slate-700 flex items-center justify-center text-xs font-bold text-white cursor-pointer ml-1" title="Account Settings">
+        KT
       </div>
     </div>
   </header>
 
+  <!-- MOBILE NAVIGATION TABS (Visible on small screens) -->
+  <div class="lg:hidden flex items-center overflow-x-auto px-4 py-2 bg-white dark:bg-[#0E1322] border-b border-slate-200 dark:border-slate-800 space-x-2 text-xs">
+    <button onclick="switchTab('overview')" id="mob-nav-overview" class="whitespace-nowrap px-3 py-1.5 rounded-lg font-semibold bg-blue-50 text-blue-700 dark:bg-blue-950 dark:text-blue-300">
+      <i class="fa-solid fa-chart-pie mr-1"></i> <span class="tab-lbl-overview">Overview</span>
+    </button>
+    <button onclick="switchTab('users')" id="mob-nav-users" class="whitespace-nowrap px-3 py-1.5 rounded-lg font-medium text-slate-600 dark:text-slate-300">
+      <i class="fa-solid fa-users mr-1"></i> <span class="tab-lbl-users">Users & Roles</span>
+    </button>
+    <button onclick="switchTab('billing')" id="mob-nav-billing" class="whitespace-nowrap px-3 py-1.5 rounded-lg font-medium text-slate-600 dark:text-slate-300">
+      <i class="fa-solid fa-credit-card mr-1"></i> <span class="tab-lbl-billing">Stripe Billing</span>
+    </button>
+    <button onclick="switchTab('audit')" id="mob-nav-audit" class="whitespace-nowrap px-3 py-1.5 rounded-lg font-medium text-slate-600 dark:text-slate-300">
+      <i class="fa-solid fa-shield-halved mr-1"></i> <span class="tab-lbl-audit">Audit & Security</span>
+    </button>
+    <button onclick="switchTab('settings')" id="mob-nav-settings" class="whitespace-nowrap px-3 py-1.5 rounded-lg font-medium text-slate-600 dark:text-slate-300">
+      <i class="fa-solid fa-sliders mr-1"></i> <span class="tab-lbl-settings">Settings</span>
+    </button>
+  </div>
+
   <div class="flex flex-1">
-    <!-- SIDEBAR -->
+    <!-- DESKTOP SIDEBAR -->
     <aside class="hidden lg:flex flex-col w-64 bg-white dark:bg-[#0E1322] border-r border-slate-200 dark:border-slate-800/80 p-4 space-y-6">
       <!-- Navigation Menu -->
       <div class="space-y-1">
         <div class="text-[11px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 px-3 mb-2" id="lbl-nav-main">Main Menu</div>
         
-        <button class="w-full flex items-center space-x-2.5 px-3 py-2 text-xs font-semibold rounded-lg bg-blue-50 text-blue-700 dark:bg-blue-950/60 dark:text-blue-300 transition">
+        <button onclick="switchTab('overview')" id="nav-overview" class="nav-btn w-full flex items-center space-x-2.5 px-3 py-2 text-xs font-semibold rounded-lg bg-blue-50 text-blue-700 dark:bg-blue-950/60 dark:text-blue-300 transition">
           <i class="fa-solid fa-chart-pie w-4 text-center"></i>
-          <span id="lbl-menu-overview">Overview</span>
+          <span class="tab-lbl-overview">Overview</span>
         </button>
 
-        <button class="w-full flex items-center space-x-2.5 px-3 py-2 text-xs font-medium rounded-lg text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800/60 transition">
+        <button onclick="switchTab('users')" id="nav-users" class="nav-btn w-full flex items-center space-x-2.5 px-3 py-2 text-xs font-medium rounded-lg text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800/60 transition">
           <i class="fa-solid fa-users w-4 text-center"></i>
-          <span id="lbl-menu-users">Users & Roles</span>
+          <span class="tab-lbl-users">Users & Roles</span>
           <span class="ml-auto text-[10px] bg-slate-200 dark:bg-slate-800 px-1.5 py-0.5 rounded-full font-bold">1,842</span>
         </button>
 
-        <button class="w-full flex items-center space-x-2.5 px-3 py-2 text-xs font-medium rounded-lg text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800/60 transition">
+        <button onclick="switchTab('billing')" id="nav-billing" class="nav-btn w-full flex items-center space-x-2.5 px-3 py-2 text-xs font-medium rounded-lg text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800/60 transition">
           <i class="fa-solid fa-credit-card w-4 text-center"></i>
-          <span id="lbl-menu-billing">Stripe Billing</span>
+          <span class="tab-lbl-billing">Stripe Billing</span>
         </button>
 
-        <button class="w-full flex items-center space-x-2.5 px-3 py-2 text-xs font-medium rounded-lg text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800/60 transition">
+        <button onclick="switchTab('audit')" id="nav-audit" class="nav-btn w-full flex items-center space-x-2.5 px-3 py-2 text-xs font-medium rounded-lg text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800/60 transition">
           <i class="fa-solid fa-shield-halved w-4 text-center"></i>
-          <span id="lbl-menu-audit">Audit & Security</span>
+          <span class="tab-lbl-audit">Audit & Security</span>
         </button>
 
-        <button class="w-full flex items-center space-x-2.5 px-3 py-2 text-xs font-medium rounded-lg text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800/60 transition">
+        <button onclick="switchTab('settings')" id="nav-settings" class="nav-btn w-full flex items-center space-x-2.5 px-3 py-2 text-xs font-medium rounded-lg text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800/60 transition">
           <i class="fa-solid fa-sliders w-4 text-center"></i>
-          <span id="lbl-menu-settings">Settings</span>
+          <span class="tab-lbl-settings">Settings</span>
         </button>
       </div>
 
@@ -194,213 +219,658 @@
         <p class="text-[11px] text-slate-600 dark:text-slate-300 leading-relaxed" id="lbl-card-desc">
           Get the private Next.js 15, Prisma schemas, Stripe webhook handlers, and full RBAC code.
         </p>
-        <a href="https://github.com/KipTecnologia/dashcraft-pro#commercial-license" class="block w-full py-1.5 text-center text-xs font-bold text-white bg-blue-600 hover:bg-blue-700 rounded-lg shadow-sm transition" id="lbl-card-btn">
+        <button onclick="openCheckoutModal()" class="block w-full py-1.5 text-center text-xs font-bold text-white bg-blue-600 hover:bg-blue-700 rounded-lg shadow-sm transition" id="lbl-card-btn">
           Buy License ($59)
-        </a>
+        </button>
       </div>
     </aside>
 
-    <!-- MAIN CONTENT -->
+    <!-- MAIN CONTENT CONTAINER -->
     <main class="flex-1 p-4 lg:p-8 space-y-6 max-w-7xl mx-auto w-full">
 
-      <!-- Page Header -->
-      <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-2 border-b border-slate-200 dark:border-slate-800">
-        <div>
-          <h1 class="text-xl sm:text-2xl font-extrabold text-slate-900 dark:text-white tracking-tight" id="lbl-page-title">Executive SaaS & Operations Dashboard</h1>
-          <p class="text-xs text-slate-500 dark:text-slate-400 mt-1" id="lbl-page-desc">Real-time revenue analytics, team roles, and subscription lifecycle management.</p>
-        </div>
-        <div class="flex items-center space-x-2.5">
-          <button onclick="exportTableToCSV()" class="inline-flex items-center space-x-1.5 px-3 py-1.5 text-xs font-semibold text-slate-700 dark:text-slate-200 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-700/60 shadow-sm transition">
-            <i class="fa-solid fa-file-csv text-blue-600 dark:text-blue-400"></i>
-            <span id="btn-export-csv">Export CSV</span>
-          </button>
-          <button onclick="simulateInvite()" class="inline-flex items-center space-x-1.5 px-3 py-1.5 text-xs font-bold text-white bg-blue-600 hover:bg-blue-700 rounded-lg shadow-sm shadow-blue-500/20 transition">
-            <i class="fa-solid fa-user-plus text-[11px]"></i>
-            <span id="btn-invite-member">Invite Member</span>
-          </button>
-        </div>
-      </div>
-
-      <!-- METRICS GRID (4 CARDS) -->
-      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <!-- MRR -->
-        <div class="p-4 bg-white dark:bg-[#0E1322] border border-slate-200 dark:border-slate-800 rounded-xl shadow-sm">
-          <div class="flex items-center justify-between text-xs text-slate-500 dark:text-slate-400 mb-1">
-            <span class="font-medium" id="lbl-mrr-title">Monthly Recurring Revenue</span>
-            <i class="fa-solid fa-wallet text-slate-400"></i>
-          </div>
-          <div class="text-2xl font-black text-slate-900 dark:text-white tracking-tight" id="lbl-mrr-val">$28,450</div>
-          <div class="flex items-center text-xs font-semibold text-emerald-600 dark:text-emerald-400 mt-2">
-            <i class="fa-solid fa-arrow-trend-up mr-1 text-[11px]"></i>
-            <span>+14.2%</span>
-            <span class="text-slate-400 dark:text-slate-500 font-normal ml-1" id="lbl-vs-last-month">vs last month</span>
-          </div>
-        </div>
-
-        <!-- ARR -->
-        <div class="p-4 bg-white dark:bg-[#0E1322] border border-slate-200 dark:border-slate-800 rounded-xl shadow-sm">
-          <div class="flex items-center justify-between text-xs text-slate-500 dark:text-slate-400 mb-1">
-            <span class="font-medium" id="lbl-arr-title">Annual Run Rate (ARR)</span>
-            <i class="fa-solid fa-chart-line text-slate-400"></i>
-          </div>
-          <div class="text-2xl font-black text-slate-900 dark:text-white tracking-tight" id="lbl-arr-val">$341,400</div>
-          <div class="flex items-center text-xs font-semibold text-emerald-600 dark:text-emerald-400 mt-2">
-            <i class="fa-solid fa-arrow-trend-up mr-1 text-[11px]"></i>
-            <span>+18.5%</span>
-            <span class="text-slate-400 dark:text-slate-500 font-normal ml-1" id="lbl-vs-last-year">YoY growth</span>
-          </div>
-        </div>
-
-        <!-- Active Subscriptions -->
-        <div class="p-4 bg-white dark:bg-[#0E1322] border border-slate-200 dark:border-slate-800 rounded-xl shadow-sm">
-          <div class="flex items-center justify-between text-xs text-slate-500 dark:text-slate-400 mb-1">
-            <span class="font-medium" id="lbl-subs-title">Active Subscriptions</span>
-            <i class="fa-solid fa-user-check text-slate-400"></i>
-          </div>
-          <div class="text-2xl font-black text-slate-900 dark:text-white tracking-tight" id="lbl-subs-val">1,842</div>
-          <div class="flex items-center text-xs font-semibold text-emerald-600 dark:text-emerald-400 mt-2">
-            <i class="fa-solid fa-arrow-trend-up mr-1 text-[11px]"></i>
-            <span>+8.1%</span>
-            <span class="text-slate-400 dark:text-slate-500 font-normal ml-1" id="lbl-net-expansion">net expansion</span>
-          </div>
-        </div>
-
-        <!-- Churn Rate -->
-        <div class="p-4 bg-white dark:bg-[#0E1322] border border-slate-200 dark:border-slate-800 rounded-xl shadow-sm">
-          <div class="flex items-center justify-between text-xs text-slate-500 dark:text-slate-400 mb-1">
-            <span class="font-medium" id="lbl-churn-title">Customer Churn Rate</span>
-            <i class="fa-solid fa-chart-pie text-slate-400"></i>
-          </div>
-          <div class="text-2xl font-black text-slate-900 dark:text-white tracking-tight" id="lbl-churn-val">0.85%</div>
-          <div class="flex items-center text-xs font-semibold text-emerald-600 dark:text-emerald-400 mt-2">
-            <i class="fa-solid fa-arrow-trend-down mr-1 text-[11px]"></i>
-            <span>-0.3%</span>
-            <span class="text-slate-400 dark:text-slate-500 font-normal ml-1" id="lbl-industry-low">industry benchmark</span>
-          </div>
-        </div>
-      </div>
-
-      <!-- REVENUE CHART & PIPELINE -->
-      <div class="bg-white dark:bg-[#0E1322] border border-slate-200 dark:border-slate-800 rounded-xl p-5 shadow-sm space-y-4">
-        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+      <!-- ========================================== -->
+      <!-- VIEW 1: OVERVIEW                           -->
+      <!-- ========================================== -->
+      <div id="tab-overview" class="tab-pane space-y-6">
+        <!-- Page Header -->
+        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-2 border-b border-slate-200 dark:border-slate-800">
           <div>
-            <h3 class="font-bold text-slate-900 dark:text-white text-sm" id="lbl-chart-title">MRR Trajectory & Net Volume</h3>
-            <p class="text-xs text-slate-500 dark:text-slate-400" id="lbl-chart-subtitle">Direct Stripe checkout and recurring webhook telemetry.</p>
+            <h1 class="text-xl sm:text-2xl font-extrabold text-slate-900 dark:text-white tracking-tight" id="lbl-page-title">Executive SaaS & Operations Dashboard</h1>
+            <p class="text-xs text-slate-500 dark:text-slate-400 mt-1" id="lbl-page-desc">Real-time revenue analytics, team roles, and subscription lifecycle management.</p>
           </div>
-          <!-- Time range toggles -->
-          <div class="flex items-center bg-slate-100 dark:bg-slate-900 p-0.5 rounded-lg border border-slate-200 dark:border-slate-800 text-xs">
-            <button onclick="setRange('7D')" id="btn-r-7D" class="px-2.5 py-1 rounded font-medium text-slate-600 dark:text-slate-400 hover:text-slate-900 transition">7D</button>
-            <button onclick="setRange('30D')" id="btn-r-30D" class="px-2.5 py-1 rounded font-bold bg-white dark:bg-slate-800 text-blue-600 dark:text-blue-400 shadow-sm transition">30D</button>
-            <button onclick="setRange('90D')" id="btn-r-90D" class="px-2.5 py-1 rounded font-medium text-slate-600 dark:text-slate-400 hover:text-slate-900 transition">90D</button>
-            <button onclick="setRange('12M')" id="btn-r-12M" class="px-2.5 py-1 rounded font-medium text-slate-600 dark:text-slate-400 hover:text-slate-900 transition">12M</button>
+          <div class="flex items-center space-x-2.5">
+            <button onclick="exportTableToCSV()" class="inline-flex items-center space-x-1.5 px-3 py-1.5 text-xs font-semibold text-slate-700 dark:text-slate-200 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-700/60 shadow-sm transition">
+              <i class="fa-solid fa-file-csv text-blue-600 dark:text-blue-400"></i>
+              <span class="btn-lbl-export">Export CSV</span>
+            </button>
+            <button onclick="openInviteModal()" class="inline-flex items-center space-x-1.5 px-3 py-1.5 text-xs font-bold text-white bg-blue-600 hover:bg-blue-700 rounded-lg shadow-sm shadow-blue-500/20 transition">
+              <i class="fa-solid fa-user-plus text-[11px]"></i>
+              <span class="btn-lbl-invite">Invite Member</span>
+            </button>
           </div>
         </div>
 
-        <!-- SVG Line Chart Canvas -->
-        <div class="relative h-56 w-full pt-2">
-          <svg viewBox="0 0 800 200" class="w-full h-full overflow-visible">
-            <defs>
-              <linearGradient id="chartGradient" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stop-color="#2563EB" stop-opacity="0.25"></stop>
-                <stop offset="100%" stop-color="#2563EB" stop-opacity="0.0"></stop>
-              </linearGradient>
-            </defs>
-            <!-- Grid lines -->
-            <line x1="0" y1="40" x2="800" y2="40" stroke="currentColor" class="text-slate-200/70 dark:text-slate-800/60" stroke-dasharray="4 4" />
-            <line x1="0" y1="90" x2="800" y2="90" stroke="currentColor" class="text-slate-200/70 dark:text-slate-800/60" stroke-dasharray="4 4" />
-            <line x1="0" y1="140" x2="800" y2="140" stroke="currentColor" class="text-slate-200/70 dark:text-slate-800/60" stroke-dasharray="4 4" />
-            <line x1="0" y1="190" x2="800" y2="190" stroke="currentColor" class="text-slate-200/70 dark:text-slate-800/60" stroke-dasharray="4 4" />
+        <!-- METRICS GRID (4 CARDS) -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <!-- MRR -->
+          <div class="p-4 bg-white dark:bg-[#0E1322] border border-slate-200 dark:border-slate-800 rounded-xl shadow-sm">
+            <div class="flex items-center justify-between text-xs text-slate-500 dark:text-slate-400 mb-1">
+              <span class="font-medium" id="lbl-mrr-title">Monthly Recurring Revenue</span>
+              <i class="fa-solid fa-wallet text-slate-400"></i>
+            </div>
+            <div class="text-2xl font-black text-slate-900 dark:text-white tracking-tight" id="lbl-mrr-val">$28,450</div>
+            <div class="flex items-center text-xs font-semibold text-emerald-600 dark:text-emerald-400 mt-2">
+              <i class="fa-solid fa-arrow-trend-up mr-1 text-[11px]"></i>
+              <span>+14.2%</span>
+              <span class="text-slate-400 dark:text-slate-500 font-normal ml-1" id="lbl-vs-last-month">vs last month</span>
+            </div>
+          </div>
 
-            <!-- Area fill -->
-            <path id="chartArea" d="M 0,160 Q 150,140 300,110 T 600,60 T 800,30 L 800,200 L 0,200 Z" fill="url(#chartGradient)"></path>
-            
-            <!-- Trend line -->
-            <path id="chartLine" d="M 0,160 Q 150,140 300,110 T 600,60 T 800,30" fill="none" stroke="#2563EB" stroke-width="3" stroke-linecap="round"></path>
+          <!-- ARR -->
+          <div class="p-4 bg-white dark:bg-[#0E1322] border border-slate-200 dark:border-slate-800 rounded-xl shadow-sm">
+            <div class="flex items-center justify-between text-xs text-slate-500 dark:text-slate-400 mb-1">
+              <span class="font-medium" id="lbl-arr-title">Annual Run Rate (ARR)</span>
+              <i class="fa-solid fa-chart-line text-slate-400"></i>
+            </div>
+            <div class="text-2xl font-black text-slate-900 dark:text-white tracking-tight" id="lbl-arr-val">$341,400</div>
+            <div class="flex items-center text-xs font-semibold text-emerald-600 dark:text-emerald-400 mt-2">
+              <i class="fa-solid fa-arrow-trend-up mr-1 text-[11px]"></i>
+              <span>+18.5%</span>
+              <span class="text-slate-400 dark:text-slate-500 font-normal ml-1" id="lbl-vs-last-year">YoY growth</span>
+            </div>
+          </div>
 
-            <!-- Peak point -->
-            <circle cx="800" cy="30" r="5" fill="#2563EB" stroke="#ffffff" stroke-width="2" class="dark:stroke-[#0E1322]"></circle>
-          </svg>
+          <!-- Active Subscriptions -->
+          <div class="p-4 bg-white dark:bg-[#0E1322] border border-slate-200 dark:border-slate-800 rounded-xl shadow-sm">
+            <div class="flex items-center justify-between text-xs text-slate-500 dark:text-slate-400 mb-1">
+              <span class="font-medium" id="lbl-subs-title">Active Subscriptions</span>
+              <i class="fa-solid fa-user-check text-slate-400"></i>
+            </div>
+            <div class="text-2xl font-black text-slate-900 dark:text-white tracking-tight" id="lbl-subs-val">1,842</div>
+            <div class="flex items-center text-xs font-semibold text-emerald-600 dark:text-emerald-400 mt-2">
+              <i class="fa-solid fa-arrow-trend-up mr-1 text-[11px]"></i>
+              <span>+8.1%</span>
+              <span class="text-slate-400 dark:text-slate-500 font-normal ml-1" id="lbl-net-expansion">net expansion</span>
+            </div>
+          </div>
+
+          <!-- Churn Rate -->
+          <div class="p-4 bg-white dark:bg-[#0E1322] border border-slate-200 dark:border-slate-800 rounded-xl shadow-sm">
+            <div class="flex items-center justify-between text-xs text-slate-500 dark:text-slate-400 mb-1">
+              <span class="font-medium" id="lbl-churn-title">Customer Churn Rate</span>
+              <i class="fa-solid fa-chart-pie text-slate-400"></i>
+            </div>
+            <div class="text-2xl font-black text-slate-900 dark:text-white tracking-tight" id="lbl-churn-val">0.85%</div>
+            <div class="flex items-center text-xs font-semibold text-emerald-600 dark:text-emerald-400 mt-2">
+              <i class="fa-solid fa-arrow-trend-down mr-1 text-[11px]"></i>
+              <span>-0.3%</span>
+              <span class="text-slate-400 dark:text-slate-500 font-normal ml-1" id="lbl-industry-low">industry benchmark</span>
+            </div>
+          </div>
         </div>
 
-        <div class="flex items-center justify-between text-[11px] text-slate-400 font-mono pt-1">
-          <span id="lbl-c-start">Oct 10</span>
-          <span id="lbl-c-m1">Oct 18</span>
-          <span id="lbl-c-m2">Oct 26</span>
-          <span id="lbl-c-m3">Nov 03</span>
-          <span id="lbl-c-end" class="font-bold text-blue-600 dark:text-blue-400">Today ($28,450)</span>
+        <!-- REVENUE CHART & PIPELINE -->
+        <div class="bg-white dark:bg-[#0E1322] border border-slate-200 dark:border-slate-800 rounded-xl p-5 shadow-sm space-y-4">
+          <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+            <div>
+              <h3 class="font-bold text-slate-900 dark:text-white text-sm" id="lbl-chart-title">MRR Trajectory & Net Volume</h3>
+              <p class="text-xs text-slate-500 dark:text-slate-400" id="lbl-chart-subtitle">Direct Stripe checkout and recurring webhook telemetry.</p>
+            </div>
+            <!-- Time range toggles -->
+            <div class="flex items-center bg-slate-100 dark:bg-slate-900 p-0.5 rounded-lg border border-slate-200 dark:border-slate-800 text-xs">
+              <button onclick="setRange('7D')" id="btn-r-7D" class="px-2.5 py-1 rounded font-medium text-slate-600 dark:text-slate-400 hover:text-slate-900 transition">7D</button>
+              <button onclick="setRange('30D')" id="btn-r-30D" class="px-2.5 py-1 rounded font-bold bg-white dark:bg-slate-800 text-blue-600 dark:text-blue-400 shadow-sm transition">30D</button>
+              <button onclick="setRange('90D')" id="btn-r-90D" class="px-2.5 py-1 rounded font-medium text-slate-600 dark:text-slate-400 hover:text-slate-900 transition">90D</button>
+              <button onclick="setRange('12M')" id="btn-r-12M" class="px-2.5 py-1 rounded font-medium text-slate-600 dark:text-slate-400 hover:text-slate-900 transition">12M</button>
+            </div>
+          </div>
+
+          <!-- SVG Line Chart Canvas -->
+          <div class="relative h-56 w-full pt-2">
+            <svg viewBox="0 0 800 200" class="w-full h-full overflow-visible">
+              <defs>
+                <linearGradient id="chartGradient" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stop-color="#2563EB" stop-opacity="0.25"></stop>
+                  <stop offset="100%" stop-color="#2563EB" stop-opacity="0.0"></stop>
+                </linearGradient>
+              </defs>
+              <!-- Grid lines -->
+              <line x1="0" y1="40" x2="800" y2="40" stroke="currentColor" class="text-slate-200/70 dark:text-slate-800/60" stroke-dasharray="4 4" />
+              <line x1="0" y1="90" x2="800" y2="90" stroke="currentColor" class="text-slate-200/70 dark:text-slate-800/60" stroke-dasharray="4 4" />
+              <line x1="0" y1="140" x2="800" y2="140" stroke="currentColor" class="text-slate-200/70 dark:text-slate-800/60" stroke-dasharray="4 4" />
+              <line x1="0" y1="190" x2="800" y2="190" stroke="currentColor" class="text-slate-200/70 dark:text-slate-800/60" stroke-dasharray="4 4" />
+
+              <!-- Area fill -->
+              <path id="chartArea" d="M 0,160 Q 150,140 300,110 T 600,60 T 800,30 L 800,200 L 0,200 Z" fill="url(#chartGradient)"></path>
+              
+              <!-- Trend line -->
+              <path id="chartLine" d="M 0,160 Q 150,140 300,110 T 600,60 T 800,30" fill="none" stroke="#2563EB" stroke-width="3" stroke-linecap="round"></path>
+
+              <!-- Peak point -->
+              <circle cx="800" cy="30" r="5" fill="#2563EB" stroke="#ffffff" stroke-width="2" class="dark:stroke-[#0E1322]"></circle>
+            </svg>
+          </div>
+
+          <div class="flex items-center justify-between text-[11px] text-slate-400 font-mono pt-1">
+            <span id="lbl-c-start">Oct 10</span>
+            <span id="lbl-c-m1">Oct 18</span>
+            <span id="lbl-c-m2">Oct 26</span>
+            <span id="lbl-c-m3">Nov 03</span>
+            <span id="lbl-c-end" class="font-bold text-blue-600 dark:text-blue-400">Today ($28,450)</span>
+          </div>
+        </div>
+
+        <!-- QUICK INSIGHTS & RECENT SIGNUPS PREVIEW -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
+          <div class="p-4 bg-white dark:bg-[#0E1322] border border-slate-200 dark:border-slate-800 rounded-xl shadow-sm space-y-3">
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-bold text-slate-900 dark:text-white" id="lbl-sec-channels">Acquisition Channels</span>
+              <span class="text-[10px] text-slate-400 font-mono">Last 30 Days</span>
+            </div>
+            <div class="space-y-2 text-xs">
+              <div>
+                <div class="flex justify-between text-slate-600 dark:text-slate-300 mb-1">
+                  <span>GitHub & Open Source</span>
+                  <span class="font-bold">44%</span>
+                </div>
+                <div class="w-full bg-slate-100 dark:bg-slate-800 h-1.5 rounded-full overflow-hidden">
+                  <div class="bg-blue-600 h-full rounded-full" style="width: 44%"></div>
+                </div>
+              </div>
+              <div>
+                <div class="flex justify-between text-slate-600 dark:text-slate-300 mb-1">
+                  <span>Stripe Direct Referrals</span>
+                  <span class="font-bold">32%</span>
+                </div>
+                <div class="w-full bg-slate-100 dark:bg-slate-800 h-1.5 rounded-full overflow-hidden">
+                  <div class="bg-emerald-500 h-full rounded-full" style="width: 32%"></div>
+                </div>
+              </div>
+              <div>
+                <div class="flex justify-between text-slate-600 dark:text-slate-300 mb-1">
+                  <span>Developer Word-of-Mouth</span>
+                  <span class="font-bold">24%</span>
+                </div>
+                <div class="w-full bg-slate-100 dark:bg-slate-800 h-1.5 rounded-full overflow-hidden">
+                  <div class="bg-purple-500 h-full rounded-full" style="width: 24%"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="p-4 bg-white dark:bg-[#0E1322] border border-slate-200 dark:border-slate-800 rounded-xl shadow-sm space-y-3 lg:col-span-2">
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-bold text-slate-900 dark:text-white" id="lbl-sec-activity">Real-Time Event Stream</span>
+              <button onclick="switchTab('audit')" class="text-xs text-blue-600 dark:text-blue-400 hover:underline flex items-center">
+                <span id="lbl-view-all-logs">View Full Audit Log</span> <i class="fa-solid fa-arrow-right ml-1 text-[10px]"></i>
+              </button>
+            </div>
+            <div class="space-y-2.5 text-xs">
+              <div class="flex items-center justify-between p-2 rounded-lg bg-slate-50 dark:bg-slate-900/60 border border-slate-200/60 dark:border-slate-800/60">
+                <div class="flex items-center space-x-2.5">
+                  <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+                  <span class="font-semibold text-slate-800 dark:text-slate-200">Alex Rivera</span>
+                  <span class="text-slate-400">upgraded subscription to Enterprise SaaS ($199/mo)</span>
+                </div>
+                <span class="text-[10px] text-slate-400 font-mono">2m ago</span>
+              </div>
+              <div class="flex items-center justify-between p-2 rounded-lg bg-slate-50 dark:bg-slate-900/60 border border-slate-200/60 dark:border-slate-800/60">
+                <div class="flex items-center space-x-2.5">
+                  <span class="w-2 h-2 rounded-full bg-blue-500"></span>
+                  <span class="font-semibold text-slate-800 dark:text-slate-200">Sarah Chen</span>
+                  <span class="text-slate-400">provisioned API Key dc_live_production_01</span>
+                </div>
+                <span class="text-[10px] text-slate-400 font-mono">14m ago</span>
+              </div>
+              <div class="flex items-center justify-between p-2 rounded-lg bg-slate-50 dark:bg-slate-900/60 border border-slate-200/60 dark:border-slate-800/60">
+                <div class="flex items-center space-x-2.5">
+                  <span class="w-2 h-2 rounded-full bg-purple-500"></span>
+                  <span class="font-semibold text-slate-800 dark:text-slate-200">Stripe Webhook</span>
+                  <span class="text-slate-400">invoice.payment_succeeded for inv_10948</span>
+                </div>
+                <span class="text-[10px] text-slate-400 font-mono">42m ago</span>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
 
-      <!-- ENTERPRISE DATA TABLE (USERS & ROLES) -->
-      <div class="bg-white dark:bg-[#0E1322] border border-slate-200 dark:border-slate-800 rounded-xl shadow-sm overflow-hidden">
-        <!-- Table Toolbar -->
-        <div class="p-4 border-b border-slate-200 dark:border-slate-800 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+      <!-- ========================================== -->
+      <!-- VIEW 2: USERS & ROLES                      -->
+      <!-- ========================================== -->
+      <div id="tab-users" class="tab-pane hidden space-y-6">
+        <!-- Header -->
+        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-2 border-b border-slate-200 dark:border-slate-800">
           <div>
-            <h3 class="font-bold text-slate-900 dark:text-white text-sm" id="lbl-tbl-title">Members & Access Directory</h3>
-            <p class="text-xs text-slate-500 dark:text-slate-400" id="lbl-tbl-sub">RBAC permissions, assigned SaaS tiers and status.</p>
+            <div class="flex items-center space-x-2">
+              <h1 class="text-xl sm:text-2xl font-extrabold text-slate-900 dark:text-white tracking-tight" id="lbl-users-title">Team Members & Access Control (RBAC)</h1>
+              <span class="text-xs px-2 py-0.5 font-bold rounded-full bg-blue-100 text-blue-700 dark:bg-blue-900/60 dark:text-blue-300">1,842 Total</span>
+            </div>
+            <p class="text-xs text-slate-500 dark:text-slate-400 mt-1" id="lbl-users-desc">Assign roles, manage enterprise seats, configure access permissions and audit memberships.</p>
           </div>
+          <div class="flex items-center space-x-2.5">
+            <button onclick="exportTableToCSV()" class="inline-flex items-center space-x-1.5 px-3 py-1.5 text-xs font-semibold text-slate-700 dark:text-slate-200 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-700/60 shadow-sm transition">
+              <i class="fa-solid fa-file-csv text-blue-600 dark:text-blue-400"></i>
+              <span class="btn-lbl-export">Export CSV</span>
+            </button>
+            <button onclick="openInviteModal()" class="inline-flex items-center space-x-1.5 px-3 py-1.5 text-xs font-bold text-white bg-blue-600 hover:bg-blue-700 rounded-lg shadow-sm shadow-blue-500/20 transition">
+              <i class="fa-solid fa-user-plus text-[11px]"></i>
+              <span class="btn-lbl-invite">Invite Member</span>
+            </button>
+          </div>
+        </div>
 
-          <!-- Filters -->
-          <div class="flex flex-wrap items-center gap-2">
-            <!-- Search -->
-            <div class="relative">
-              <i class="fa-solid fa-magnifying-glass absolute left-2.5 top-2.5 text-xs text-slate-400"></i>
-              <input type="text" id="tblSearch" oninput="filterTable()" placeholder="Filter by name, email..." class="pl-8 pr-3 py-1.5 text-xs rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-1 focus:ring-blue-500 w-44 sm:w-56">
+        <!-- Role Permissions Matrix Banner -->
+        <div class="p-4 rounded-xl bg-white dark:bg-[#0E1322] border border-slate-200 dark:border-slate-800 shadow-sm">
+          <div class="text-xs font-bold text-slate-900 dark:text-white mb-3 flex items-center justify-between">
+            <span id="lbl-rbac-matrix-title">Role-Based Access Control (RBAC) Matrix</span>
+            <span class="text-[11px] text-slate-400 font-mono">Governed by Prisma ORM</span>
+          </div>
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 text-xs">
+            <div class="p-3 rounded-lg border border-blue-200 dark:border-blue-900/50 bg-blue-50/40 dark:bg-blue-950/20">
+              <span class="font-bold text-blue-700 dark:text-blue-300">Admin</span>
+              <p class="text-[11px] text-slate-600 dark:text-slate-400 mt-1">Full platform control, billing management, role delegation, export access.</p>
+            </div>
+            <div class="p-3 rounded-lg border border-purple-200 dark:border-purple-900/50 bg-purple-50/40 dark:bg-purple-950/20">
+              <span class="font-bold text-purple-700 dark:text-purple-300">Manager</span>
+              <p class="text-[11px] text-slate-600 dark:text-slate-400 mt-1">Inviting members, managing teams, view analytics, download CSV reports.</p>
+            </div>
+            <div class="p-3 rounded-lg border border-amber-200 dark:border-amber-900/50 bg-amber-50/40 dark:bg-amber-950/20">
+              <span class="font-bold text-amber-700 dark:text-amber-300">Developer</span>
+              <p class="text-[11px] text-slate-600 dark:text-slate-400 mt-1">API keys generation, webhook telemetry inspection, sandbox integration.</p>
+            </div>
+            <div class="p-3 rounded-lg border border-emerald-200 dark:border-emerald-900/50 bg-emerald-50/40 dark:bg-emerald-950/20">
+              <span class="font-bold text-emerald-700 dark:text-emerald-300">Billing</span>
+              <p class="text-[11px] text-slate-600 dark:text-slate-400 mt-1">Stripe portal access, invoice downloads, payment method changes.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- ENTERPRISE DATA TABLE -->
+        <div class="bg-white dark:bg-[#0E1322] border border-slate-200 dark:border-slate-800 rounded-xl shadow-sm overflow-hidden">
+          <!-- Table Toolbar -->
+          <div class="p-4 border-b border-slate-200 dark:border-slate-800 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+            <div>
+              <h3 class="font-bold text-slate-900 dark:text-white text-sm" id="lbl-tbl-title">Members & Access Directory</h3>
+              <p class="text-xs text-slate-500 dark:text-slate-400" id="lbl-tbl-sub">RBAC permissions, assigned SaaS tiers and status.</p>
             </div>
 
-            <!-- Role filter -->
-            <select id="roleFilter" onchange="filterTable()" class="px-2.5 py-1.5 text-xs rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 text-slate-700 dark:text-slate-300 focus:outline-none">
-              <option value="ALL">All Roles</option>
-              <option value="Admin">Admin</option>
-              <option value="Manager">Manager</option>
-              <option value="Developer">Developer</option>
-              <option value="Billing">Billing</option>
-            </select>
+            <!-- Filters -->
+            <div class="flex flex-wrap items-center gap-2">
+              <!-- Search -->
+              <div class="relative">
+                <i class="fa-solid fa-magnifying-glass absolute left-2.5 top-2.5 text-xs text-slate-400"></i>
+                <input type="text" id="tblSearch" oninput="filterTable()" placeholder="Filter by name, email..." class="pl-8 pr-3 py-1.5 text-xs rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-1 focus:ring-blue-500 w-44 sm:w-56">
+              </div>
 
-            <!-- Status filter -->
-            <select id="statusFilter" onchange="filterTable()" class="px-2.5 py-1.5 text-xs rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 text-slate-700 dark:text-slate-300 focus:outline-none">
-              <option value="ALL">All Statuses</option>
-              <option value="Active">Active</option>
-              <option value="Trial">Trial</option>
-              <option value="Past Due">Past Due</option>
-              <option value="Canceled">Canceled</option>
-            </select>
+              <!-- Role filter -->
+              <select id="roleFilter" onchange="filterTable()" class="px-2.5 py-1.5 text-xs rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 text-slate-700 dark:text-slate-300 focus:outline-none">
+                <option value="ALL">All Roles</option>
+                <option value="Admin">Admin</option>
+                <option value="Manager">Manager</option>
+                <option value="Developer">Developer</option>
+                <option value="Billing">Billing</option>
+              </select>
+
+              <!-- Status filter -->
+              <select id="statusFilter" onchange="filterTable()" class="px-2.5 py-1.5 text-xs rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 text-slate-700 dark:text-slate-300 focus:outline-none">
+                <option value="ALL">All Statuses</option>
+                <option value="Active">Active</option>
+                <option value="Trial">Trial</option>
+                <option value="Past Due">Past Due</option>
+                <option value="Canceled">Canceled</option>
+              </select>
+            </div>
           </div>
-        </div>
 
-        <!-- Table View -->
-        <div class="overflow-x-auto">
-          <table class="w-full text-left text-xs border-collapse">
-            <thead>
-              <tr class="bg-slate-50/75 dark:bg-slate-900/60 border-b border-slate-200 dark:border-slate-800 font-semibold text-slate-500 dark:text-slate-400">
-                <th class="py-3 px-4" id="th-user">User</th>
-                <th class="py-3 px-4" id="th-role">Role (RBAC)</th>
-                <th class="py-3 px-4" id="th-plan">SaaS Plan</th>
-                <th class="py-3 px-4" id="th-mrr">MRR Value</th>
-                <th class="py-3 px-4" id="th-status">Status</th>
-                <th class="py-3 px-4" id="th-active">Last Active</th>
-                <th class="py-3 px-4 text-right" id="th-actions">Actions</th>
-              </tr>
-            </thead>
-            <tbody id="tblBody" class="divide-y divide-slate-200 dark:divide-slate-800/80">
-              <!-- Rendered via JS -->
-            </tbody>
-          </table>
-        </div>
+          <!-- Table View -->
+          <div class="overflow-x-auto">
+            <table class="w-full text-left text-xs border-collapse">
+              <thead>
+                <tr class="bg-slate-50/75 dark:bg-slate-900/60 border-b border-slate-200 dark:border-slate-800 font-semibold text-slate-500 dark:text-slate-400">
+                  <th class="py-3 px-4" id="th-user">User</th>
+                  <th class="py-3 px-4" id="th-role">Role (RBAC)</th>
+                  <th class="py-3 px-4" id="th-plan">SaaS Plan</th>
+                  <th class="py-3 px-4" id="th-mrr">MRR Value</th>
+                  <th class="py-3 px-4" id="th-status">Status</th>
+                  <th class="py-3 px-4" id="th-active">Last Active</th>
+                  <th class="py-3 px-4 text-right" id="th-actions">Actions</th>
+                </tr>
+              </thead>
+              <tbody id="tblBody" class="divide-y divide-slate-200 dark:divide-slate-800/80">
+                <!-- Rendered via JS -->
+              </tbody>
+            </table>
+          </div>
 
-        <!-- Table Footer / Pagination -->
-        <div class="p-3 border-t border-slate-200 dark:border-slate-800 flex items-center justify-between text-xs text-slate-500">
-          <span id="lbl-tbl-count">Showing 6 of 1,842 members</span>
-          <div class="flex items-center space-x-1">
-            <button class="px-2 py-1 rounded border border-slate-200 dark:border-slate-800 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-400 cursor-not-allowed">Previous</button>
-            <button class="px-2 py-1 rounded bg-blue-50 text-blue-600 font-bold dark:bg-blue-950 dark:text-blue-300">1</button>
-            <button class="px-2 py-1 rounded border border-slate-200 dark:border-slate-800 hover:bg-slate-100 dark:hover:bg-slate-800">2</button>
-            <button class="px-2 py-1 rounded border border-slate-200 dark:border-slate-800 hover:bg-slate-100 dark:hover:bg-slate-800">Next</button>
+          <!-- Table Footer / Pagination -->
+          <div class="p-3 border-t border-slate-200 dark:border-slate-800 flex items-center justify-between text-xs text-slate-500">
+            <span id="lbl-tbl-count">Showing 6 of 1,842 members</span>
+            <div class="flex items-center space-x-1">
+              <button class="px-2 py-1 rounded border border-slate-200 dark:border-slate-800 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-400 cursor-not-allowed">Previous</button>
+              <button class="px-2 py-1 rounded bg-blue-50 text-blue-600 font-bold dark:bg-blue-950 dark:text-blue-300">1</button>
+              <button class="px-2 py-1 rounded border border-slate-200 dark:border-slate-800 hover:bg-slate-100 dark:hover:bg-slate-800">2</button>
+              <button class="px-2 py-1 rounded border border-slate-200 dark:border-slate-800 hover:bg-slate-100 dark:hover:bg-slate-800">Next</button>
+            </div>
           </div>
         </div>
       </div>
 
-      <!-- STRIPE MONETIZATION & COMMERCIAL STOREFRONT -->
+      <!-- ========================================== -->
+      <!-- VIEW 3: STRIPE BILLING                     -->
+      <!-- ========================================== -->
+      <div id="tab-billing" class="tab-pane hidden space-y-6">
+        <!-- Header -->
+        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-2 border-b border-slate-200 dark:border-slate-800">
+          <div>
+            <h1 class="text-xl sm:text-2xl font-extrabold text-slate-900 dark:text-white tracking-tight" id="lbl-billing-title">Stripe Subscriptions & SaaS Monetization</h1>
+            <p class="text-xs text-slate-500 dark:text-slate-400 mt-1" id="lbl-billing-desc">Manage subscription plans, recurring invoices, customer billing portal and webhook dispatchers.</p>
+          </div>
+          <button onclick="openCheckoutModal()" class="inline-flex items-center space-x-1.5 px-3 py-1.5 text-xs font-bold text-white bg-blue-600 hover:bg-blue-700 rounded-lg shadow-sm transition">
+            <i class="fa-solid fa-credit-card text-[11px]"></i>
+            <span id="btn-manage-stripe">Manage Customer Portal</span>
+          </button>
+        </div>
+
+        <!-- Current Plan Overview Card -->
+        <div class="p-5 rounded-xl border border-blue-200 dark:border-blue-900/60 bg-gradient-to-r from-blue-50/60 via-white to-slate-50 dark:from-blue-950/20 dark:via-[#0E1322] dark:to-[#0B0F19] shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div class="space-y-1.5">
+            <div class="flex items-center space-x-2">
+              <span class="text-xs font-bold uppercase tracking-wider text-blue-600 dark:text-blue-400" id="lbl-plan-active-tag">Active Subscription</span>
+              <span class="px-2 py-0.5 text-[10px] font-bold rounded-full bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300">Auto-Renewing</span>
+            </div>
+            <h2 class="text-xl font-black text-slate-900 dark:text-white">Enterprise Tier ($499 / month)</h2>
+            <p class="text-xs text-slate-500 dark:text-slate-400" id="lbl-plan-details">Includes unlimited seats, custom roles, 99.99% SLA, and dedicated PostgreSQL database isolation.</p>
+          </div>
+          <div class="flex items-center space-x-3">
+            <div class="text-right hidden sm:block">
+              <div class="text-xs text-slate-400" id="lbl-next-charge">Next invoice on</div>
+              <div class="text-xs font-mono font-bold text-slate-900 dark:text-white">Dec 01, 2026</div>
+            </div>
+            <button onclick="showToast('Customer portal session generated via Stripe SDK', 'success')" class="px-3 py-2 text-xs font-semibold rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 hover:bg-slate-50 transition">
+              <i class="fa-solid fa-arrow-up-right-from-square mr-1 text-[10px]"></i> Portal Link
+            </button>
+          </div>
+        </div>
+
+        <!-- SaaS Pricing Tiers -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <!-- Starter -->
+          <div class="p-5 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-[#0E1322] shadow-sm space-y-4">
+            <div class="space-y-1">
+              <span class="text-xs font-bold text-slate-500 uppercase tracking-wider">Starter</span>
+              <div class="text-2xl font-black text-slate-900 dark:text-white">$49 <span class="text-xs font-normal text-slate-400">/ mo</span></div>
+              <p class="text-xs text-slate-500">Perfect for bootstrapped founders and micro-teams.</p>
+            </div>
+            <ul class="text-xs space-y-2 text-slate-600 dark:text-slate-300">
+              <li class="flex items-center"><i class="fa-solid fa-check text-emerald-500 mr-2"></i> 5 Team Members</li>
+              <li class="flex items-center"><i class="fa-solid fa-check text-emerald-500 mr-2"></i> 30-day Audit Logs</li>
+              <li class="flex items-center"><i class="fa-solid fa-check text-emerald-500 mr-2"></i> Standard Analytics</li>
+              <li class="flex items-center text-slate-400"><i class="fa-solid fa-xmark mr-2 text-slate-300"></i> No Custom Roles</li>
+            </ul>
+            <button onclick="showToast('Switching plan simulated', 'info')" class="w-full py-2 text-xs font-semibold rounded-lg border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800 transition">
+              Downgrade to Starter
+            </button>
+          </div>
+
+          <!-- Growth -->
+          <div class="p-5 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-[#0E1322] shadow-sm space-y-4">
+            <div class="space-y-1">
+              <span class="text-xs font-bold text-slate-500 uppercase tracking-wider">Growth Pro</span>
+              <div class="text-2xl font-black text-slate-900 dark:text-white">$149 <span class="text-xs font-normal text-slate-400">/ mo</span></div>
+              <p class="text-xs text-slate-500">For scaling SaaS businesses requiring audit compliance.</p>
+            </div>
+            <ul class="text-xs space-y-2 text-slate-600 dark:text-slate-300">
+              <li class="flex items-center"><i class="fa-solid fa-check text-emerald-500 mr-2"></i> 25 Team Members</li>
+              <li class="flex items-center"><i class="fa-solid fa-check text-emerald-500 mr-2"></i> Unlimited Audit History</li>
+              <li class="flex items-center"><i class="fa-solid fa-check text-emerald-500 mr-2"></i> Real-time Webhooks</li>
+              <li class="flex items-center"><i class="fa-solid fa-check text-emerald-500 mr-2"></i> Priority Support</li>
+            </ul>
+            <button onclick="showToast('Switching plan simulated', 'info')" class="w-full py-2 text-xs font-semibold rounded-lg border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800 transition">
+              Select Growth Pro
+            </button>
+          </div>
+
+          <!-- Enterprise (Current) -->
+          <div class="p-5 rounded-xl border-2 border-blue-600 bg-white dark:bg-[#0E1322] shadow-md space-y-4 relative">
+            <span class="absolute -top-2.5 right-4 px-2 py-0.5 text-[10px] font-extrabold rounded-full bg-blue-600 text-white uppercase tracking-wider">Current Plan</span>
+            <div class="space-y-1">
+              <span class="text-xs font-bold text-blue-600 uppercase tracking-wider">Enterprise Scale</span>
+              <div class="text-2xl font-black text-slate-900 dark:text-white">$499 <span class="text-xs font-normal text-slate-400">/ mo</span></div>
+              <p class="text-xs text-slate-500">Dedicated isolation, bespoke SLA & SOC2 compliance.</p>
+            </div>
+            <ul class="text-xs space-y-2 text-slate-600 dark:text-slate-300">
+              <li class="flex items-center"><i class="fa-solid fa-check text-emerald-500 mr-2"></i> Unlimited Team Seats</li>
+              <li class="flex items-center"><i class="fa-solid fa-check text-emerald-500 mr-2"></i> SAML SSO & SCIM</li>
+              <li class="flex items-center"><i class="fa-solid fa-check text-emerald-500 mr-2"></i> Dedicated DB Isolation</li>
+              <li class="flex items-center"><i class="fa-solid fa-check text-emerald-500 mr-2"></i> 99.99% Uptime Guarantee</li>
+            </ul>
+            <button disabled class="w-full py-2 text-xs font-bold rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-400 cursor-default">
+              Active Plan
+            </button>
+          </div>
+        </div>
+
+        <!-- Invoices History Table -->
+        <div class="bg-white dark:bg-[#0E1322] border border-slate-200 dark:border-slate-800 rounded-xl shadow-sm overflow-hidden space-y-2">
+          <div class="p-4 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between">
+            <h3 class="font-bold text-slate-900 dark:text-white text-sm" id="lbl-inv-title">Billing & Invoice History</h3>
+            <span class="text-xs text-slate-400 font-mono">Synchronized with Stripe Webhooks</span>
+          </div>
+          <div class="overflow-x-auto">
+            <table class="w-full text-left text-xs">
+              <thead class="bg-slate-50 dark:bg-slate-900/60 border-b border-slate-200 dark:border-slate-800 font-semibold text-slate-500">
+                <tr>
+                  <th class="py-2.5 px-4">Invoice #</th>
+                  <th class="py-2.5 px-4">Billing Date</th>
+                  <th class="py-2.5 px-4">Amount</th>
+                  <th class="py-2.5 px-4">Status</th>
+                  <th class="py-2.5 px-4 text-right">Receipt</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-slate-200 dark:divide-slate-800/80 font-mono">
+                <tr>
+                  <td class="py-3 px-4 font-bold text-slate-800 dark:text-slate-200">INV-2026-1101</td>
+                  <td class="py-3 px-4 text-slate-600 dark:text-slate-300">Nov 01, 2026</td>
+                  <td class="py-3 px-4 text-slate-900 dark:text-white font-bold">$499.00</td>
+                  <td class="py-3 px-4"><span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300">Paid</span></td>
+                  <td class="py-3 px-4 text-right font-sans"><button onclick="showToast('Simulating PDF invoice download...', 'success')" class="text-blue-600 dark:text-blue-400 hover:underline"><i class="fa-solid fa-download mr-1"></i> PDF</button></td>
+                </tr>
+                <tr>
+                  <td class="py-3 px-4 font-bold text-slate-800 dark:text-slate-200">INV-2026-1001</td>
+                  <td class="py-3 px-4 text-slate-600 dark:text-slate-300">Oct 01, 2026</td>
+                  <td class="py-3 px-4 text-slate-900 dark:text-white font-bold">$499.00</td>
+                  <td class="py-3 px-4"><span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300">Paid</span></td>
+                  <td class="py-3 px-4 text-right font-sans"><button onclick="showToast('Simulating PDF invoice download...', 'success')" class="text-blue-600 dark:text-blue-400 hover:underline"><i class="fa-solid fa-download mr-1"></i> PDF</button></td>
+                </tr>
+                <tr>
+                  <td class="py-3 px-4 font-bold text-slate-800 dark:text-slate-200">INV-2026-0901</td>
+                  <td class="py-3 px-4 text-slate-600 dark:text-slate-300">Sep 01, 2026</td>
+                  <td class="py-3 px-4 text-slate-900 dark:text-white font-bold">$499.00</td>
+                  <td class="py-3 px-4"><span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300">Paid</span></td>
+                  <td class="py-3 px-4 text-right font-sans"><button onclick="showToast('Simulating PDF invoice download...', 'success')" class="text-blue-600 dark:text-blue-400 hover:underline"><i class="fa-solid fa-download mr-1"></i> PDF</button></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- ========================================== -->
+      <!-- VIEW 4: AUDIT & SECURITY                   -->
+      <!-- ========================================== -->
+      <div id="tab-audit" class="tab-pane hidden space-y-6">
+        <!-- Header -->
+        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-2 border-b border-slate-200 dark:border-slate-800">
+          <div>
+            <h1 class="text-xl sm:text-2xl font-extrabold text-slate-900 dark:text-white tracking-tight" id="lbl-audit-title">Security Governance & Immutable Audit Trail</h1>
+            <p class="text-xs text-slate-500 dark:text-slate-400 mt-1" id="lbl-audit-desc">Comprehensive event telemetry, compliance history, session policies, and IP restriction logs.</p>
+          </div>
+          <button onclick="showToast('Audit log export queued for download', 'success')" class="inline-flex items-center space-x-1.5 px-3 py-1.5 text-xs font-semibold text-slate-700 dark:text-slate-200 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg hover:bg-slate-50 shadow-sm transition">
+            <i class="fa-solid fa-download text-blue-600"></i>
+            <span>Export JSON Audit</span>
+          </button>
+        </div>
+
+        <!-- Security Metrics Summary -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div class="p-4 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-[#0E1322] shadow-sm">
+            <div class="text-xs text-slate-500 mb-1">Two-Factor Authentication</div>
+            <div class="text-xl font-black text-emerald-600 dark:text-emerald-400 flex items-center">
+              <i class="fa-solid fa-lock mr-2 text-sm"></i> 100% Enforced
+            </div>
+            <div class="text-[11px] text-slate-400 mt-1">All workspace members</div>
+          </div>
+          <div class="p-4 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-[#0E1322] shadow-sm">
+            <div class="text-xs text-slate-500 mb-1">Active Sessions</div>
+            <div class="text-xl font-black text-slate-900 dark:text-white flex items-center">
+              <i class="fa-solid fa-desktop mr-2 text-sm text-blue-500"></i> 14 Devices
+            </div>
+            <div class="text-[11px] text-slate-400 mt-1">Across 3 geographic regions</div>
+          </div>
+          <div class="p-4 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-[#0E1322] shadow-sm">
+            <div class="text-xs text-slate-500 mb-1">Failed Auth Attempts</div>
+            <div class="text-xl font-black text-slate-900 dark:text-white flex items-center">
+              <i class="fa-solid fa-shield-virus mr-2 text-sm text-emerald-500"></i> 0 in 24h
+            </div>
+            <div class="text-[11px] text-slate-400 mt-1">Zero brute force alerts</div>
+          </div>
+          <div class="p-4 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-[#0E1322] shadow-sm">
+            <div class="text-xs text-slate-500 mb-1">Compliance Standard</div>
+            <div class="text-xl font-black text-blue-600 dark:text-blue-400 flex items-center">
+              <i class="fa-solid fa-certificate mr-2 text-sm"></i> SOC2 Type II
+            </div>
+            <div class="text-[11px] text-slate-400 mt-1">GDPR & ISO 27001 Ready</div>
+          </div>
+        </div>
+
+        <!-- Audit Trail Table -->
+        <div class="bg-white dark:bg-[#0E1322] border border-slate-200 dark:border-slate-800 rounded-xl shadow-sm overflow-hidden">
+          <div class="p-4 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between">
+            <h3 class="font-bold text-slate-900 dark:text-white text-sm" id="lbl-audit-stream">Real-time Security Event Stream</h3>
+            <span class="text-xs text-slate-400 font-mono">Recorded in Prisma AuditLog</span>
+          </div>
+          <div class="overflow-x-auto">
+            <table class="w-full text-left text-xs">
+              <thead class="bg-slate-50 dark:bg-slate-900/60 border-b border-slate-200 dark:border-slate-800 font-semibold text-slate-500">
+                <tr>
+                  <th class="py-2.5 px-4">Timestamp</th>
+                  <th class="py-2.5 px-4">Actor</th>
+                  <th class="py-2.5 px-4">Action</th>
+                  <th class="py-2.5 px-4">Target Resource</th>
+                  <th class="py-2.5 px-4">IP Address</th>
+                  <th class="py-2.5 px-4 text-right">Severity</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-slate-200 dark:divide-slate-800/80 font-mono">
+                <tr>
+                  <td class="py-3 px-4 text-slate-400">2026-11-09 12:15:04</td>
+                  <td class="py-3 px-4 font-sans font-bold text-slate-800 dark:text-slate-200">Alex Rivera</td>
+                  <td class="py-3 px-4 text-blue-600 dark:text-blue-400">user.role_change</td>
+                  <td class="py-3 px-4 text-slate-500">usr_03 (Manager)</td>
+                  <td class="py-3 px-4">192.168.1.42</td>
+                  <td class="py-3 px-4 text-right font-sans"><span class="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300">Medium</span></td>
+                </tr>
+                <tr>
+                  <td class="py-3 px-4 text-slate-400">2026-11-09 11:42:19</td>
+                  <td class="py-3 px-4 font-sans font-bold text-slate-800 dark:text-slate-200">Stripe Webhook</td>
+                  <td class="py-3 px-4 text-emerald-600 dark:text-emerald-400">subscription.renewed</td>
+                  <td class="py-3 px-4 text-slate-500">sub_ent_enterprise</td>
+                  <td class="py-3 px-4">54.187.12.89</td>
+                  <td class="py-3 px-4 text-right font-sans"><span class="px-2 py-0.5 rounded text-[10px] font-bold bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300">Low</span></td>
+                </tr>
+                <tr>
+                  <td class="py-3 px-4 text-slate-400">2026-11-09 10:05:32</td>
+                  <td class="py-3 px-4 font-sans font-bold text-slate-800 dark:text-slate-200">Sarah Chen</td>
+                  <td class="py-3 px-4 text-purple-600 dark:text-purple-400">api_key.created</td>
+                  <td class="py-3 px-4 text-slate-500">key_production_01</td>
+                  <td class="py-3 px-4">10.0.4.15</td>
+                  <td class="py-3 px-4 text-right font-sans"><span class="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300">Medium</span></td>
+                </tr>
+                <tr>
+                  <td class="py-3 px-4 text-slate-400">2026-11-09 08:30:11</td>
+                  <td class="py-3 px-4 font-sans font-bold text-slate-800 dark:text-slate-200">Elena Rostova</td>
+                  <td class="py-3 px-4 text-slate-700 dark:text-slate-300">report.exported_csv</td>
+                  <td class="py-3 px-4 text-slate-500">members_all.csv</td>
+                  <td class="py-3 px-4">84.112.5.90</td>
+                  <td class="py-3 px-4 text-right font-sans"><span class="px-2 py-0.5 rounded text-[10px] font-bold bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300">Low</span></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- ========================================== -->
+      <!-- VIEW 5: SETTINGS                           -->
+      <!-- ========================================== -->
+      <div id="tab-settings" class="tab-pane hidden space-y-6">
+        <!-- Header -->
+        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-2 border-b border-slate-200 dark:border-slate-800">
+          <div>
+            <h1 class="text-xl sm:text-2xl font-extrabold text-slate-900 dark:text-white tracking-tight" id="lbl-settings-title">Workspace Configuration & Preferences</h1>
+            <p class="text-xs text-slate-500 dark:text-slate-400 mt-1" id="lbl-settings-desc">Manage tenant identity, API keys, developer webhooks, email notifications, and regional options.</p>
+          </div>
+          <button onclick="showToast('Settings saved successfully!', 'success')" class="inline-flex items-center space-x-1.5 px-4 py-1.5 text-xs font-bold text-white bg-blue-600 hover:bg-blue-700 rounded-lg shadow-sm transition">
+            <i class="fa-solid fa-floppy-disk text-[11px]"></i>
+            <span id="btn-save-settings">Save Changes</span>
+          </button>
+        </div>
+
+        <!-- Form Cards -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <!-- Workspace Profile -->
+          <div class="p-5 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-[#0E1322] shadow-sm space-y-4">
+            <h3 class="text-sm font-bold text-slate-900 dark:text-white" id="lbl-ws-profile">Tenant & Workspace Profile</h3>
+            
+            <div class="space-y-1.5 text-xs">
+              <label class="font-semibold text-slate-700 dark:text-slate-300">Workspace Legal Name</label>
+              <input type="text" value="Kip Tecnologia" class="w-full px-3 py-2 rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-1 focus:ring-blue-500 font-medium">
+            </div>
+
+            <div class="space-y-1.5 text-xs">
+              <label class="font-semibold text-slate-700 dark:text-slate-300">URL Slug</label>
+              <div class="flex items-center">
+                <span class="px-3 py-2 text-xs bg-slate-100 dark:bg-slate-800 border border-r-0 border-slate-200 dark:border-slate-700 rounded-l-lg text-slate-400">app.dashcraft.io/</span>
+                <input type="text" value="kip-tecnologia" class="w-full px-3 py-2 rounded-r-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-200 focus:outline-none font-mono">
+              </div>
+            </div>
+
+            <div class="space-y-1.5 text-xs">
+              <label class="font-semibold text-slate-700 dark:text-slate-300">Billing & Compliance Email</label>
+              <input type="email" value="contato@kiptecnologia.com.br" class="w-full px-3 py-2 rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-200 focus:outline-none font-mono">
+            </div>
+          </div>
+
+          <!-- Webhook & API Keys -->
+          <div class="p-5 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-[#0E1322] shadow-sm space-y-4">
+            <h3 class="text-sm font-bold text-slate-900 dark:text-white" id="lbl-api-webhooks">API Keys & Stripe Webhooks</h3>
+            
+            <div class="space-y-1.5 text-xs">
+              <div class="flex items-center justify-between">
+                <label class="font-semibold text-slate-700 dark:text-slate-300">Live Production API Key</label>
+                <button onclick="showToast('API Key copied to clipboard', 'success')" class="text-blue-600 dark:text-blue-400 text-[11px] hover:underline">Copy Key</button>
+              </div>
+              <input type="password" value="dc_live_kip_99a823e1f0c2918b99d" readonly class="w-full px-3 py-2 rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-100 dark:bg-slate-900 text-slate-500 font-mono text-xs">
+            </div>
+
+            <div class="space-y-1.5 text-xs">
+              <label class="font-semibold text-slate-700 dark:text-slate-300">Stripe Webhook Listener URL</label>
+              <input type="text" value="https://api.kiptecnologia.com.br/v1/stripe/webhook" class="w-full px-3 py-2 rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-200 font-mono text-xs focus:outline-none">
+            </div>
+
+            <div class="flex items-center justify-between p-2.5 rounded-lg bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-800 text-xs">
+              <div class="flex items-center space-x-2 text-emerald-800 dark:text-emerald-300 font-semibold">
+                <i class="fa-solid fa-circle-check"></i>
+                <span>Stripe Signature Verification Active</span>
+              </div>
+              <span class="text-[10px] font-mono text-emerald-600">whsec_...</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- COMMERCIAL STOREFRONT BANNER (Always present at the bottom of the app) -->
       <div id="commercial-license" class="p-6 rounded-2xl bg-gradient-to-b from-white to-slate-50 dark:from-[#0E1322] dark:to-[#0B0F19] border border-blue-200/80 dark:border-blue-900/40 shadow-md space-y-6">
         <div class="text-center max-w-2xl mx-auto space-y-2">
           <span class="text-xs font-bold uppercase tracking-wider text-blue-600 dark:text-blue-400" id="lbl-com-tag">Commercial Deployment License</span>
@@ -454,7 +924,7 @@
           <a href="https://github.com/KipTecnologia/dashcraft-pro" class="w-full sm:w-auto px-5 py-2.5 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200 text-xs font-bold text-center hover:bg-slate-50 transition">
             <i class="fa-brands fa-github mr-1.5"></i> Star on GitHub
           </a>
-          <button onclick="simulateCheckout()" class="w-full sm:w-auto px-6 py-2.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold text-center shadow-lg shadow-blue-500/25 transition">
+          <button onclick="openCheckoutModal()" class="w-full sm:w-auto px-6 py-2.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold text-center shadow-lg shadow-blue-500/25 transition">
             <i class="fa-solid fa-bolt mr-1.5"></i> <span id="btn-buy-bottom">Buy Commercial Boilerplate ($59)</span>
           </button>
         </div>
@@ -462,16 +932,97 @@
     </main>
   </div>
 
+  <!-- INVITE MEMBER MODAL -->
+  <div id="inviteModal" class="fixed inset-0 z-50 bg-slate-900/50 backdrop-blur-sm hidden flex items-center justify-center p-4">
+    <div class="bg-white dark:bg-[#0E1322] border border-slate-200 dark:border-slate-800 rounded-2xl shadow-2xl max-w-md w-full p-6 space-y-4">
+      <div class="flex items-center justify-between pb-2 border-b border-slate-200 dark:border-slate-800">
+        <h3 class="text-base font-bold text-slate-900 dark:text-white" id="lbl-modal-invite-title">Invite New Team Member</h3>
+        <button onclick="closeInviteModal()" class="text-slate-400 hover:text-slate-600 text-sm"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div class="space-y-3 text-xs">
+        <div>
+          <label class="block font-semibold text-slate-700 dark:text-slate-300 mb-1" id="lbl-modal-email">Email Address</label>
+          <input type="email" id="inviteEmail" placeholder="colleague@company.com" class="w-full px-3 py-2 rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-1 focus:ring-blue-500">
+        </div>
+        <div>
+          <label class="block font-semibold text-slate-700 dark:text-slate-300 mb-1" id="lbl-modal-role">Assign Role</label>
+          <select id="inviteRole" class="w-full px-3 py-2 rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-200 focus:outline-none">
+            <option value="Admin">Admin (Full Control)</option>
+            <option value="Manager">Manager (Team Management)</option>
+            <option value="Developer" selected>Developer (API & Webhooks)</option>
+            <option value="Billing">Billing (Invoices & Stripe)</option>
+          </select>
+        </div>
+      </div>
+      <div class="flex items-center justify-end space-x-2 pt-2">
+        <button onclick="closeInviteModal()" class="px-3.5 py-2 text-xs font-semibold rounded-lg border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-50 transition">Cancel</button>
+        <button onclick="submitInvite()" class="px-4 py-2 text-xs font-bold rounded-lg bg-blue-600 hover:bg-blue-700 text-white shadow-sm transition">Send Invite</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- CHECKOUT / COMMERCIAL LICENSE MODAL -->
+  <div id="checkoutModal" class="fixed inset-0 z-50 bg-slate-900/50 backdrop-blur-sm hidden flex items-center justify-center p-4">
+    <div class="bg-white dark:bg-[#0E1322] border border-slate-200 dark:border-slate-800 rounded-2xl shadow-2xl max-w-lg w-full p-6 space-y-4">
+      <div class="flex items-center justify-between pb-2 border-b border-slate-200 dark:border-slate-800">
+        <div>
+          <h3 class="text-base font-bold text-slate-900 dark:text-white" id="lbl-modal-com-title">DashCraft Pro Commercial License</h3>
+          <p class="text-xs text-slate-500" id="lbl-modal-com-sub">One-time purchase • Full production source code & private repository access</p>
+        </div>
+        <button onclick="closeCheckoutModal()" class="text-slate-400 hover:text-slate-600 text-sm"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div class="space-y-2 text-xs text-slate-600 dark:text-slate-300 py-2">
+        <div class="flex items-center"><i class="fa-solid fa-circle-check text-emerald-500 mr-2.5"></i> Full Next.js 15 App Router & React 19 source code</div>
+        <div class="flex items-center"><i class="fa-solid fa-circle-check text-emerald-500 mr-2.5"></i> Complete Prisma ORM schema (Users, Roles, Subscriptions, Audit Logs)</div>
+        <div class="flex items-center"><i class="fa-solid fa-circle-check text-emerald-500 mr-2.5"></i> Turnkey Stripe Checkout and webhook lifecycle endpoints</div>
+        <div class="flex items-center"><i class="fa-solid fa-circle-check text-emerald-500 mr-2.5"></i> 100% White-Label Rights (Deploy unlimited SaaS products)</div>
+      </div>
+      <div class="p-3 rounded-xl bg-blue-50/60 dark:bg-blue-950/30 border border-blue-200 dark:border-blue-900/40 flex items-center justify-between">
+        <div>
+          <div class="text-xs font-bold text-blue-900 dark:text-blue-200">Kip Tecnologia Official Store</div>
+          <div class="text-[11px] text-blue-700 dark:text-blue-300">Direct instant delivery via Gumroad or Stripe</div>
+        </div>
+        <div class="text-lg font-black text-blue-600 dark:text-blue-400">$59</div>
+      </div>
+      <div class="flex items-center justify-end space-x-2 pt-2">
+        <button onclick="closeCheckoutModal()" class="px-3.5 py-2 text-xs font-semibold rounded-lg border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-50 transition">Cancel</button>
+        <a href="https://rancharia.gumroad.com" target="_blank" rel="noreferrer" class="px-5 py-2 text-xs font-bold rounded-lg bg-blue-600 hover:bg-blue-700 text-white shadow-md transition">Proceed to Checkout</a>
+      </div>
+    </div>
+  </div>
+
   <!-- COMMAND PALETTE MODAL (⌘K) -->
   <div id="cmdModal" class="fixed inset-0 z-50 bg-slate-900/50 backdrop-blur-sm hidden flex items-start justify-center pt-24 px-4">
     <div class="bg-white dark:bg-[#0E1322] border border-slate-200 dark:border-slate-800 rounded-xl shadow-2xl max-w-lg w-full overflow-hidden">
       <div class="p-3 border-b border-slate-200 dark:border-slate-800 flex items-center space-x-2.5">
         <i class="fa-solid fa-magnifying-glass text-slate-400 text-sm"></i>
-        <input type="text" id="cmdInput" placeholder="Type a command or search..." class="w-full text-xs bg-transparent focus:outline-none text-slate-800 dark:text-slate-100">
+        <input type="text" id="cmdInput" placeholder="Type a command or navigate tabs..." class="w-full text-xs bg-transparent focus:outline-none text-slate-800 dark:text-slate-100">
         <button onclick="toggleCommandPalette()" class="text-xs text-slate-400 hover:text-slate-600 font-mono">ESC</button>
       </div>
       <div class="p-2 text-xs space-y-1">
-        <div class="text-[10px] font-bold uppercase tracking-wider text-slate-400 px-2 py-1">Quick Actions</div>
+        <div class="text-[10px] font-bold uppercase tracking-wider text-slate-400 px-2 py-1">Navigate Views</div>
+        <button onclick="switchTab('overview'); toggleCommandPalette();" class="w-full text-left px-2.5 py-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800/80 flex items-center justify-between text-slate-700 dark:text-slate-300">
+          <span><i class="fa-solid fa-chart-pie mr-2 text-blue-500"></i> Go to Overview</span>
+          <kbd class="text-[10px] text-slate-400">1</kbd>
+        </button>
+        <button onclick="switchTab('users'); toggleCommandPalette();" class="w-full text-left px-2.5 py-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800/80 flex items-center justify-between text-slate-700 dark:text-slate-300">
+          <span><i class="fa-solid fa-users mr-2 text-indigo-500"></i> Go to Users & Roles</span>
+          <kbd class="text-[10px] text-slate-400">2</kbd>
+        </button>
+        <button onclick="switchTab('billing'); toggleCommandPalette();" class="w-full text-left px-2.5 py-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800/80 flex items-center justify-between text-slate-700 dark:text-slate-300">
+          <span><i class="fa-solid fa-credit-card mr-2 text-emerald-500"></i> Go to Stripe Billing</span>
+          <kbd class="text-[10px] text-slate-400">3</kbd>
+        </button>
+        <button onclick="switchTab('audit'); toggleCommandPalette();" class="w-full text-left px-2.5 py-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800/80 flex items-center justify-between text-slate-700 dark:text-slate-300">
+          <span><i class="fa-solid fa-shield-halved mr-2 text-purple-500"></i> Go to Audit & Security</span>
+          <kbd class="text-[10px] text-slate-400">4</kbd>
+        </button>
+        <button onclick="switchTab('settings'); toggleCommandPalette();" class="w-full text-left px-2.5 py-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800/80 flex items-center justify-between text-slate-700 dark:text-slate-300">
+          <span><i class="fa-solid fa-sliders mr-2 text-amber-500"></i> Go to Settings</span>
+          <kbd class="text-[10px] text-slate-400">5</kbd>
+        </button>
+
+        <div class="text-[10px] font-bold uppercase tracking-wider text-slate-400 px-2 pt-2 pb-1">Quick Actions</div>
         <button onclick="toggleTheme(); toggleCommandPalette();" class="w-full text-left px-2.5 py-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800/80 flex items-center justify-between text-slate-700 dark:text-slate-300">
           <span><i class="fa-solid fa-circle-half-stroke mr-2 text-blue-500"></i> Toggle Light/Dark Theme</span>
           <kbd class="text-[10px] text-slate-400">T</kbd>
@@ -493,24 +1044,25 @@
     // State
     let currentLang = 'en';
     let isDark = false;
+    let activeTab = 'overview';
 
     // Database Mock (Members & RBAC)
     const membersData = {
       en: [
-        { id: 'usr_01', name: 'Alex Rivera', email: 'alex.rivera@acme.inc', role: 'Admin', plan: 'Enterprise SaaS', mrr: '$199', status: 'Active', active: 'Just now', avatar: 'AR' },
-        { id: 'usr_02', name: 'Sarah Chen', email: 'sarah.c@fintech.io', role: 'Developer', plan: 'Growth Tier', mrr: '$79', status: 'Active', active: '12m ago', avatar: 'SC' },
-        { id: 'usr_03', name: 'Marcus Brody', email: 'marcus@brodyanalytics.com', role: 'Manager', plan: 'Enterprise SaaS', mrr: '$199', status: 'Trial', active: '45m ago', avatar: 'MB' },
-        { id: 'usr_04', name: 'Elena Rostova', email: 'elena@novacapital.de', role: 'Billing', plan: 'Growth Tier', mrr: '$79', status: 'Active', active: '2h ago', avatar: 'ER' },
-        { id: 'usr_05', name: 'David Kim', email: 'david.kim@seoultech.kr', role: 'Developer', plan: 'Starter Tier', mrr: '$29', status: 'Past Due', active: '1d ago', avatar: 'DK' },
-        { id: 'usr_06', name: 'Chloe Vance', email: 'chloe@vancestudio.design', role: 'Manager', plan: 'Starter Tier', mrr: '$29', status: 'Canceled', active: '3d ago', avatar: 'CV' }
+        { id: 'usr_01', name: 'Alex Rivera', email: 'alex.rivera@acme.inc', role: 'Admin', plan: 'Enterprise Scale', mrr: '$499', status: 'Active', active: 'Just now', avatar: 'AR' },
+        { id: 'usr_02', name: 'Sarah Chen', email: 'sarah.c@fintech.io', role: 'Developer', plan: 'Growth Pro', mrr: '$149', status: 'Active', active: '12m ago', avatar: 'SC' },
+        { id: 'usr_03', name: 'Marcus Brody', email: 'marcus@brodyanalytics.com', role: 'Manager', plan: 'Enterprise Scale', mrr: '$499', status: 'Trial', active: '45m ago', avatar: 'MB' },
+        { id: 'usr_04', name: 'Elena Rostova', email: 'elena@novacapital.de', role: 'Billing', plan: 'Growth Pro', mrr: '$149', status: 'Active', active: '2h ago', avatar: 'ER' },
+        { id: 'usr_05', name: 'David Kim', email: 'david.kim@seoultech.kr', role: 'Developer', plan: 'Starter', mrr: '$49', status: 'Past Due', active: '1d ago', avatar: 'DK' },
+        { id: 'usr_06', name: 'Chloe Vance', email: 'chloe@vancestudio.design', role: 'Manager', plan: 'Starter', mrr: '$49', status: 'Canceled', active: '3d ago', avatar: 'CV' }
       ],
       pt: [
-        { id: 'usr_01', name: 'Carlos Henrique', email: 'carlos.h@empresa.com.br', role: 'Admin', plan: 'SaaS Empresarial', mrr: 'R$ 995', status: 'Ativo', active: 'Agora mesmo', avatar: 'CH' },
-        { id: 'usr_02', name: 'Juliana Mendes', email: 'juliana.m@fintech.com.br', role: 'Desenvolvedor', plan: 'Plano Crescimento', mrr: 'R$ 395', status: 'Ativo', active: 'Há 12 min', avatar: 'JM' },
-        { id: 'usr_03', name: 'Marcos Silveira', email: 'marcos@silveira.io', role: 'Gestor', plan: 'SaaS Empresarial', mrr: 'R$ 995', status: 'Avaliação', active: 'Há 45 min', avatar: 'MS' },
-        { id: 'usr_04', name: 'Helena Rocha', email: 'helena@capital.com.br', role: 'Faturamento', plan: 'Plano Crescimento', mrr: 'R$ 395', status: 'Ativo', active: 'Há 2h', avatar: 'HR' },
-        { id: 'usr_05', name: 'Diego Barbosa', email: 'diego@techbras.com.br', role: 'Desenvolvedor', plan: 'Plano Inicial', mrr: 'R$ 145', status: 'Atrasado', active: 'Ontem', avatar: 'DB' },
-        { id: 'usr_06', name: 'Camila Vasconcelos', email: 'camila@estudio.design', role: 'Gestor', plan: 'Plano Inicial', mrr: 'R$ 145', status: 'Cancelado', active: 'Há 3 dias', avatar: 'CV' }
+        { id: 'usr_01', name: 'Carlos Henrique', email: 'carlos.h@empresa.com.br', role: 'Admin', plan: 'Empresarial Escala', mrr: 'R$ 2.495', status: 'Ativo', active: 'Agora mesmo', avatar: 'CH' },
+        { id: 'usr_02', name: 'Juliana Mendes', email: 'juliana.m@fintech.com.br', role: 'Desenvolvedor', plan: 'Plano Crescimento', mrr: 'R$ 745', status: 'Ativo', active: 'Há 12 min', avatar: 'JM' },
+        { id: 'usr_03', name: 'Marcos Silveira', email: 'marcos@silveira.io', role: 'Gestor', plan: 'Empresarial Escala', mrr: 'R$ 2.495', status: 'Avaliação', active: 'Há 45 min', avatar: 'MS' },
+        { id: 'usr_04', name: 'Helena Rocha', email: 'helena@capital.com.br', role: 'Faturamento', plan: 'Plano Crescimento', mrr: 'R$ 745', status: 'Ativo', active: 'Há 2h', avatar: 'HR' },
+        { id: 'usr_05', name: 'Diego Barbosa', email: 'diego@techbras.com.br', role: 'Desenvolvedor', plan: 'Plano Inicial', mrr: 'R$ 245', status: 'Atrasado', active: 'Ontem', avatar: 'DB' },
+        { id: 'usr_06', name: 'Camila Vasconcelos', email: 'camila@estudio.design', role: 'Gestor', plan: 'Plano Inicial', mrr: 'R$ 245', status: 'Cancelado', active: 'Há 3 dias', avatar: 'CV' }
       ]
     };
 
@@ -631,6 +1183,94 @@
       }
     };
 
+    // Tab Navigation Logic
+    function switchTab(tabId) {
+      activeTab = tabId;
+      const tabs = ['overview', 'users', 'billing', 'audit', 'settings'];
+      
+      tabs.forEach(t => {
+        const pane = document.getElementById(`tab-${t}`);
+        const navBtn = document.getElementById(`nav-${t}`);
+        const mobBtn = document.getElementById(`mob-nav-${t}`);
+
+        if (t === tabId) {
+          if (pane) pane.classList.remove('hidden');
+          if (navBtn) {
+            navBtn.className = 'nav-btn w-full flex items-center space-x-2.5 px-3 py-2 text-xs font-semibold rounded-lg bg-blue-50 text-blue-700 dark:bg-blue-950/60 dark:text-blue-300 transition';
+          }
+          if (mobBtn) {
+            mobBtn.className = 'whitespace-nowrap px-3 py-1.5 rounded-lg font-semibold bg-blue-50 text-blue-700 dark:bg-blue-950 dark:text-blue-300';
+          }
+        } else {
+          if (pane) pane.classList.add('hidden');
+          if (navBtn) {
+            navBtn.className = 'nav-btn w-full flex items-center space-x-2.5 px-3 py-2 text-xs font-medium rounded-lg text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800/60 transition';
+          }
+          if (mobBtn) {
+            mobBtn.className = 'whitespace-nowrap px-3 py-1.5 rounded-lg font-medium text-slate-600 dark:text-slate-300';
+          }
+        }
+      });
+
+      // Scroll smoothly to top of main
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    // Toast System
+    function showToast(msg, type = 'success') {
+      const toast = document.getElementById('toast');
+      const toastMsg = document.getElementById('toast-msg');
+      const toastIcon = document.getElementById('toast-icon');
+
+      toastMsg.innerText = msg;
+      if (type === 'success') {
+        toastIcon.className = 'fa-solid fa-circle-check text-emerald-400 dark:text-emerald-600';
+      } else if (type === 'info') {
+        toastIcon.className = 'fa-solid fa-circle-info text-blue-400 dark:text-blue-600';
+      } else {
+        toastIcon.className = 'fa-solid fa-triangle-exclamation text-amber-400 dark:text-amber-600';
+      }
+
+      toast.classList.remove('translate-y-16', 'opacity-0');
+      toast.classList.add('translate-y-0', 'opacity-100');
+
+      setTimeout(() => {
+        toast.classList.remove('translate-y-0', 'opacity-100');
+        toast.classList.add('translate-y-16', 'opacity-0');
+      }, 3200);
+    }
+
+    // Modals
+    function openInviteModal() {
+      document.getElementById('inviteModal').classList.remove('hidden');
+      setTimeout(() => document.getElementById('inviteEmail').focus(), 50);
+    }
+
+    function closeInviteModal() {
+      document.getElementById('inviteModal').classList.add('hidden');
+    }
+
+    function submitInvite() {
+      const email = document.getElementById('inviteEmail').value;
+      const role = document.getElementById('inviteRole').value;
+      if (!email) {
+        showToast(currentLang === 'pt' ? 'Digite um e-mail válido' : 'Please enter a valid email', 'error');
+        return;
+      }
+      closeInviteModal();
+      showToast(currentLang === 'pt' ? `Convite com cargo ${role} enviado para ${email}!` : `Invitation with ${role} role dispatched to ${email}!`, 'success');
+      document.getElementById('inviteEmail').value = '';
+    }
+
+    function openCheckoutModal() {
+      document.getElementById('checkoutModal').classList.remove('hidden');
+    }
+
+    function closeCheckoutModal() {
+      document.getElementById('checkoutModal').classList.add('hidden');
+    }
+
+    // Bilingual Engine
     function applyLanguage(lang) {
       currentLang = lang;
       const d = dictionary[lang];
@@ -641,15 +1281,22 @@
         if (el) el.innerText = val;
       };
 
+      const setAll = (className, val) => {
+        document.querySelectorAll(`.${className}`).forEach(el => el.innerText = val);
+      };
+
+      setAll('tab-lbl-overview', d.overview);
+      setAll('tab-lbl-users', d.users);
+      setAll('tab-lbl-billing', d.billing);
+      setAll('tab-lbl-audit', d.audit);
+      setAll('tab-lbl-settings', d.settings);
+      setAll('btn-lbl-export', d.exportCsv);
+      setAll('btn-lbl-invite', d.inviteMember);
+
       setText('txt-workspace-label', d.workspace);
       document.getElementById('txt-search-placeholder').innerText = d.searchPlaceholder;
       setText('lbl-buy-top', d.buyTop);
       setText('lbl-nav-main', d.navMain);
-      setText('lbl-menu-overview', d.overview);
-      setText('lbl-menu-users', d.users);
-      setText('lbl-menu-billing', d.billing);
-      setText('lbl-menu-audit', d.audit);
-      setText('lbl-menu-settings', d.settings);
       setText('lbl-system-health', d.sysHealth);
       setText('lbl-system-desc', d.sysDesc);
       setText('lbl-card-title', d.cardTitle);
@@ -657,8 +1304,6 @@
       setText('lbl-card-btn', d.cardBtn);
       setText('lbl-page-title', d.pageTitle);
       setText('lbl-page-desc', d.pageDesc);
-      setText('btn-export-csv', d.exportCsv);
-      setText('btn-invite-member', d.inviteMember);
       setText('lbl-mrr-title', d.mrrTitle);
       setText('lbl-mrr-val', d.mrrVal);
       setText('lbl-vs-last-month', d.vsLastMonth);
@@ -721,6 +1366,7 @@
     // Table Rendering & Filters
     function renderTable() {
       const tbody = document.getElementById('tblBody');
+      if (!tbody) return;
       const data = membersData[currentLang] || membersData.en;
       const search = (document.getElementById('tblSearch').value || '').toLowerCase();
       const role = document.getElementById('roleFilter').value;
@@ -772,7 +1418,7 @@
             </td>
             <td class="py-3 px-4 text-slate-500 dark:text-slate-400">${m.active}</td>
             <td class="py-3 px-4 text-right">
-              <button onclick="alert('Simulation: RBAC & Stripe details modal opened for ${m.name}')" class="p-1 rounded text-slate-400 hover:text-slate-600 dark:hover:text-slate-200">
+              <button onclick="showToast('Member permissions dialog loaded for ${m.name}', 'info')" class="p-1 rounded text-slate-400 hover:text-slate-600 dark:hover:text-slate-200">
                 <i class="fa-solid fa-ellipsis"></i>
               </button>
             </td>
@@ -800,6 +1446,7 @@
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
+      showToast(currentLang === 'pt' ? 'Exportação CSV gerada com sucesso!' : 'CSV export generated successfully!', 'success');
     }
 
     // Command Palette
@@ -818,6 +1465,8 @@
       } else if (e.key === 'Escape') {
         const modal = document.getElementById('cmdModal');
         if (!modal.classList.contains('hidden')) modal.classList.add('hidden');
+        closeInviteModal();
+        closeCheckoutModal();
       }
     });
 
@@ -831,15 +1480,7 @@
           b.className = 'px-2.5 py-1 rounded font-medium text-slate-600 dark:text-slate-400 hover:text-slate-900 transition';
         }
       });
-    }
-
-    function simulateInvite() {
-      const email = prompt(currentLang === 'pt' ? 'Digite o e-mail do novo membro para enviar o convite:' : 'Enter the new member email to send the invite:');
-      if (email) alert(currentLang === 'pt' ? `Convite com permissão padrão enviado para ${email}!` : `Invite sent to ${email} with default role!`);
-    }
-
-    function simulateCheckout() {
-      alert(currentLang === 'pt' ? 'Simulação de Checkout: Redirecionando para Stripe Checkout oficial da Kip Tecnologia...' : 'Simulation Checkout: Redirecting to official Kip Tecnologia Stripe Checkout...');
+      showToast(`MRR trajectory updated for range: ${range}`, 'info');
     }
 
     // Initialize in clean Light Mode by default
