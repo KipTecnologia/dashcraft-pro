@@ -1,0 +1,849 @@
+<!DOCTYPE html>
+<html lang="en" class="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DashCraft Pro v2.0 - Enterprise Next.js 15 Admin & Analytics Boilerplate | Kip Tecnologia</title>
+  
+  <!-- SEO & Social Meta -->
+  <meta name="description" content="Production-ready Enterprise Admin & Analytics Dashboard Boilerplate. Built with Next.js 15, Mantine/Radix design tokens, Prisma ORM, RBAC, and Stripe SaaS billing.">
+  <meta property="og:title" content="DashCraft Pro v2.0 - Enterprise Admin & Analytics Boilerplate">
+  <meta property="og:description" content="Clean, data-dense enterprise dashboard in Next.js 15. No AI-cliché dark neon; pure refined corporate design.">
+  <meta property="og:image" content="https://kiptecnologia.github.io/dashcraft-pro/public/gumroad-cover.jpg">
+  <meta name="twitter:card" content="summary_large_image">
+
+  <!-- Inter Font & Tailwind CDN -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+  <script>
+    if (typeof tailwind !== 'undefined') {
+      tailwind.config = {
+        darkMode: 'class',
+        theme: {
+          extend: {
+            fontFamily: {
+              sans: ['Inter', 'sans-serif'],
+              mono: ['JetBrains Mono', 'monospace'],
+            },
+            colors: {
+              brand: {
+                50: '#F0F6FE',
+                100: '#E0EEFD',
+                500: '#2563EB',
+                600: '#1D4ED8',
+                700: '#1E40AF',
+              }
+            }
+          }
+        }
+      };
+    }
+  </script>
+
+  <style>
+    /* Refined Enterprise Aesthetics - Mantine / Radix Inspired */
+    body {
+      font-family: 'Inter', sans-serif;
+      -webkit-font-smoothing: antialiased;
+    }
+    .custom-scroll::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    .custom-scroll::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    .custom-scroll::-webkit-scrollbar-thumb {
+      background: #CBD5E1;
+      border-radius: 4px;
+    }
+    .dark .custom-scroll::-webkit-scrollbar-thumb {
+      background: #334155;
+    }
+    .badge-dot::before {
+      content: '';
+      display: inline-block;
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      margin-right: 6px;
+    }
+    .badge-active::before { background-color: #10B981; }
+    .badge-pastdue::before { background-color: #EF4444; }
+    .badge-trial::before { background-color: #3B82F6; }
+    .badge-canceled::before { background-color: #94A3B8; }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-800 dark:bg-[#0B0F19] dark:text-slate-100 min-h-screen flex flex-col transition-colors duration-200">
+
+  <!-- TOP APP BAR -->
+  <header class="sticky top-0 z-40 bg-white/95 dark:bg-[#0E1322]/95 backdrop-blur border-b border-slate-200 dark:border-slate-800/80 px-4 lg:px-6 py-2.5 flex items-center justify-between">
+    <!-- Brand & Workspace -->
+    <div class="flex items-center space-x-4">
+      <div class="flex items-center space-x-2.5">
+        <div class="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center text-white font-bold shadow-sm shadow-blue-500/20">
+          <i class="fa-solid fa-chart-line text-sm"></i>
+        </div>
+        <div>
+          <span class="font-extrabold text-slate-900 dark:text-white text-base tracking-tight">DashCraft</span>
+          <span class="text-xs px-1.5 py-0.5 ml-1 font-semibold rounded bg-blue-50 text-blue-700 dark:bg-blue-950/80 dark:text-blue-300 border border-blue-200 dark:border-blue-800/50">PRO v2.0</span>
+        </div>
+      </div>
+      <div class="hidden md:flex items-center text-xs text-slate-400 dark:text-slate-500 space-x-2 pl-3 border-l border-slate-200 dark:border-slate-800">
+        <span class="text-slate-600 dark:text-slate-300 font-medium">Kip Tecnologia</span>
+        <span>/</span>
+        <span id="txt-workspace-label">Production Workspace</span>
+      </div>
+    </div>
+
+    <!-- Center Search & Command Trigger -->
+    <div class="hidden sm:flex flex-1 max-w-md mx-6">
+      <button onclick="toggleCommandPalette()" class="w-full text-left flex items-center justify-between px-3 py-1.5 text-xs text-slate-500 dark:text-slate-400 bg-slate-100/80 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg hover:border-slate-300 dark:hover:border-slate-700 transition">
+        <span class="flex items-center space-x-2">
+          <i class="fa-solid fa-magnifying-glass text-slate-400"></i>
+          <span id="txt-search-placeholder">Quick search users, metrics or settings...</span>
+        </span>
+        <kbd class="font-mono text-[10px] bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 px-1.5 py-0.5 rounded text-slate-500 dark:text-slate-400 shadow-sm">⌘K</kbd>
+      </button>
+    </div>
+
+    <!-- Actions & Selectors -->
+    <div class="flex items-center space-x-2.5">
+      <!-- Bilingual Switcher -->
+      <button onclick="toggleLanguage()" id="lang-btn" class="flex items-center space-x-1.5 px-2.5 py-1 text-xs font-semibold rounded-lg bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700 transition" title="Toggle Language (EN / PT)">
+        <span>🇺🇸</span>
+        <span id="lang-label">English</span>
+      </button>
+
+      <!-- Theme Switcher -->
+      <button onclick="toggleTheme()" class="w-8 h-8 flex items-center justify-center rounded-lg bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700 transition" title="Toggle Light / Dark Mode">
+        <i id="theme-icon" class="fa-solid fa-moon text-xs"></i>
+      </button>
+
+      <!-- Commercial Buy Link -->
+      <a href="https://github.com/KipTecnologia/dashcraft-pro#commercial-license" class="hidden md:inline-flex items-center space-x-1.5 px-3 py-1 text-xs font-bold text-white bg-blue-600 hover:bg-blue-700 rounded-lg shadow-sm shadow-blue-600/30 transition">
+        <i class="fa-solid fa-lock text-[11px]"></i>
+        <span id="lbl-buy-top">Commercial License ($59)</span>
+      </a>
+
+      <!-- Profile Avatar -->
+      <div class="w-8 h-8 rounded-full bg-gradient-to-tr from-slate-700 to-slate-900 border border-slate-300 dark:border-slate-700 flex items-center justify-center text-xs font-bold text-white cursor-pointer ml-1">
+        AR
+      </div>
+    </div>
+  </header>
+
+  <div class="flex flex-1">
+    <!-- SIDEBAR -->
+    <aside class="hidden lg:flex flex-col w-64 bg-white dark:bg-[#0E1322] border-r border-slate-200 dark:border-slate-800/80 p-4 space-y-6">
+      <!-- Navigation Menu -->
+      <div class="space-y-1">
+        <div class="text-[11px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 px-3 mb-2" id="lbl-nav-main">Main Menu</div>
+        
+        <button class="w-full flex items-center space-x-2.5 px-3 py-2 text-xs font-semibold rounded-lg bg-blue-50 text-blue-700 dark:bg-blue-950/60 dark:text-blue-300 transition">
+          <i class="fa-solid fa-chart-pie w-4 text-center"></i>
+          <span id="lbl-menu-overview">Overview</span>
+        </button>
+
+        <button class="w-full flex items-center space-x-2.5 px-3 py-2 text-xs font-medium rounded-lg text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800/60 transition">
+          <i class="fa-solid fa-users w-4 text-center"></i>
+          <span id="lbl-menu-users">Users & Roles</span>
+          <span class="ml-auto text-[10px] bg-slate-200 dark:bg-slate-800 px-1.5 py-0.5 rounded-full font-bold">1,842</span>
+        </button>
+
+        <button class="w-full flex items-center space-x-2.5 px-3 py-2 text-xs font-medium rounded-lg text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800/60 transition">
+          <i class="fa-solid fa-credit-card w-4 text-center"></i>
+          <span id="lbl-menu-billing">Stripe Billing</span>
+        </button>
+
+        <button class="w-full flex items-center space-x-2.5 px-3 py-2 text-xs font-medium rounded-lg text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800/60 transition">
+          <i class="fa-solid fa-shield-halved w-4 text-center"></i>
+          <span id="lbl-menu-audit">Audit & Security</span>
+        </button>
+
+        <button class="w-full flex items-center space-x-2.5 px-3 py-2 text-xs font-medium rounded-lg text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800/60 transition">
+          <i class="fa-solid fa-sliders w-4 text-center"></i>
+          <span id="lbl-menu-settings">Settings</span>
+        </button>
+      </div>
+
+      <!-- System Health Card -->
+      <div class="p-3 rounded-xl bg-slate-50 dark:bg-slate-900/80 border border-slate-200 dark:border-slate-800 space-y-2">
+        <div class="flex items-center justify-between text-xs">
+          <span class="font-semibold text-slate-700 dark:text-slate-300 flex items-center">
+            <span class="w-2 h-2 rounded-full bg-emerald-500 mr-2 animate-pulse"></span>
+            <span id="lbl-system-health">System Status</span>
+          </span>
+          <span class="text-[11px] font-bold text-emerald-600 dark:text-emerald-400">99.98%</span>
+        </div>
+        <p class="text-[11px] text-slate-500 dark:text-slate-400" id="lbl-system-desc">Prisma DB, Stripe webhooks and Next.js 15 API routes nominal.</p>
+      </div>
+
+      <!-- Commercial License Promo Card -->
+      <div class="mt-auto p-3.5 rounded-xl bg-gradient-to-br from-blue-50 to-slate-100 dark:from-slate-900 dark:to-blue-950/40 border border-blue-200 dark:border-blue-900/50 space-y-2.5">
+        <div class="flex items-center space-x-2">
+          <div class="w-6 h-6 rounded bg-blue-600 text-white flex items-center justify-center text-xs">
+            <i class="fa-solid fa-code"></i>
+          </div>
+          <span class="text-xs font-bold text-slate-900 dark:text-white" id="lbl-card-title">Production Source Code</span>
+        </div>
+        <p class="text-[11px] text-slate-600 dark:text-slate-300 leading-relaxed" id="lbl-card-desc">
+          Get the private Next.js 15, Prisma schemas, Stripe webhook handlers, and full RBAC code.
+        </p>
+        <a href="https://github.com/KipTecnologia/dashcraft-pro#commercial-license" class="block w-full py-1.5 text-center text-xs font-bold text-white bg-blue-600 hover:bg-blue-700 rounded-lg shadow-sm transition" id="lbl-card-btn">
+          Buy License ($59)
+        </a>
+      </div>
+    </aside>
+
+    <!-- MAIN CONTENT -->
+    <main class="flex-1 p-4 lg:p-8 space-y-6 max-w-7xl mx-auto w-full">
+
+      <!-- Page Header -->
+      <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-2 border-b border-slate-200 dark:border-slate-800">
+        <div>
+          <h1 class="text-xl sm:text-2xl font-extrabold text-slate-900 dark:text-white tracking-tight" id="lbl-page-title">Executive SaaS & Operations Dashboard</h1>
+          <p class="text-xs text-slate-500 dark:text-slate-400 mt-1" id="lbl-page-desc">Real-time revenue analytics, team roles, and subscription lifecycle management.</p>
+        </div>
+        <div class="flex items-center space-x-2.5">
+          <button onclick="exportTableToCSV()" class="inline-flex items-center space-x-1.5 px-3 py-1.5 text-xs font-semibold text-slate-700 dark:text-slate-200 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-700/60 shadow-sm transition">
+            <i class="fa-solid fa-file-csv text-blue-600 dark:text-blue-400"></i>
+            <span id="btn-export-csv">Export CSV</span>
+          </button>
+          <button onclick="simulateInvite()" class="inline-flex items-center space-x-1.5 px-3 py-1.5 text-xs font-bold text-white bg-blue-600 hover:bg-blue-700 rounded-lg shadow-sm shadow-blue-500/20 transition">
+            <i class="fa-solid fa-user-plus text-[11px]"></i>
+            <span id="btn-invite-member">Invite Member</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- METRICS GRID (4 CARDS) -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <!-- MRR -->
+        <div class="p-4 bg-white dark:bg-[#0E1322] border border-slate-200 dark:border-slate-800 rounded-xl shadow-sm">
+          <div class="flex items-center justify-between text-xs text-slate-500 dark:text-slate-400 mb-1">
+            <span class="font-medium" id="lbl-mrr-title">Monthly Recurring Revenue</span>
+            <i class="fa-solid fa-wallet text-slate-400"></i>
+          </div>
+          <div class="text-2xl font-black text-slate-900 dark:text-white tracking-tight" id="lbl-mrr-val">$28,450</div>
+          <div class="flex items-center text-xs font-semibold text-emerald-600 dark:text-emerald-400 mt-2">
+            <i class="fa-solid fa-arrow-trend-up mr-1 text-[11px]"></i>
+            <span>+14.2%</span>
+            <span class="text-slate-400 dark:text-slate-500 font-normal ml-1" id="lbl-vs-last-month">vs last month</span>
+          </div>
+        </div>
+
+        <!-- ARR -->
+        <div class="p-4 bg-white dark:bg-[#0E1322] border border-slate-200 dark:border-slate-800 rounded-xl shadow-sm">
+          <div class="flex items-center justify-between text-xs text-slate-500 dark:text-slate-400 mb-1">
+            <span class="font-medium" id="lbl-arr-title">Annual Run Rate (ARR)</span>
+            <i class="fa-solid fa-chart-line text-slate-400"></i>
+          </div>
+          <div class="text-2xl font-black text-slate-900 dark:text-white tracking-tight" id="lbl-arr-val">$341,400</div>
+          <div class="flex items-center text-xs font-semibold text-emerald-600 dark:text-emerald-400 mt-2">
+            <i class="fa-solid fa-arrow-trend-up mr-1 text-[11px]"></i>
+            <span>+18.5%</span>
+            <span class="text-slate-400 dark:text-slate-500 font-normal ml-1" id="lbl-vs-last-year">YoY growth</span>
+          </div>
+        </div>
+
+        <!-- Active Subscriptions -->
+        <div class="p-4 bg-white dark:bg-[#0E1322] border border-slate-200 dark:border-slate-800 rounded-xl shadow-sm">
+          <div class="flex items-center justify-between text-xs text-slate-500 dark:text-slate-400 mb-1">
+            <span class="font-medium" id="lbl-subs-title">Active Subscriptions</span>
+            <i class="fa-solid fa-user-check text-slate-400"></i>
+          </div>
+          <div class="text-2xl font-black text-slate-900 dark:text-white tracking-tight" id="lbl-subs-val">1,842</div>
+          <div class="flex items-center text-xs font-semibold text-emerald-600 dark:text-emerald-400 mt-2">
+            <i class="fa-solid fa-arrow-trend-up mr-1 text-[11px]"></i>
+            <span>+8.1%</span>
+            <span class="text-slate-400 dark:text-slate-500 font-normal ml-1" id="lbl-net-expansion">net expansion</span>
+          </div>
+        </div>
+
+        <!-- Churn Rate -->
+        <div class="p-4 bg-white dark:bg-[#0E1322] border border-slate-200 dark:border-slate-800 rounded-xl shadow-sm">
+          <div class="flex items-center justify-between text-xs text-slate-500 dark:text-slate-400 mb-1">
+            <span class="font-medium" id="lbl-churn-title">Customer Churn Rate</span>
+            <i class="fa-solid fa-chart-pie text-slate-400"></i>
+          </div>
+          <div class="text-2xl font-black text-slate-900 dark:text-white tracking-tight" id="lbl-churn-val">0.85%</div>
+          <div class="flex items-center text-xs font-semibold text-emerald-600 dark:text-emerald-400 mt-2">
+            <i class="fa-solid fa-arrow-trend-down mr-1 text-[11px]"></i>
+            <span>-0.3%</span>
+            <span class="text-slate-400 dark:text-slate-500 font-normal ml-1" id="lbl-industry-low">industry benchmark</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- REVENUE CHART & PIPELINE -->
+      <div class="bg-white dark:bg-[#0E1322] border border-slate-200 dark:border-slate-800 rounded-xl p-5 shadow-sm space-y-4">
+        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+          <div>
+            <h3 class="font-bold text-slate-900 dark:text-white text-sm" id="lbl-chart-title">MRR Trajectory & Net Volume</h3>
+            <p class="text-xs text-slate-500 dark:text-slate-400" id="lbl-chart-subtitle">Direct Stripe checkout and recurring webhook telemetry.</p>
+          </div>
+          <!-- Time range toggles -->
+          <div class="flex items-center bg-slate-100 dark:bg-slate-900 p-0.5 rounded-lg border border-slate-200 dark:border-slate-800 text-xs">
+            <button onclick="setRange('7D')" id="btn-r-7D" class="px-2.5 py-1 rounded font-medium text-slate-600 dark:text-slate-400 hover:text-slate-900 transition">7D</button>
+            <button onclick="setRange('30D')" id="btn-r-30D" class="px-2.5 py-1 rounded font-bold bg-white dark:bg-slate-800 text-blue-600 dark:text-blue-400 shadow-sm transition">30D</button>
+            <button onclick="setRange('90D')" id="btn-r-90D" class="px-2.5 py-1 rounded font-medium text-slate-600 dark:text-slate-400 hover:text-slate-900 transition">90D</button>
+            <button onclick="setRange('12M')" id="btn-r-12M" class="px-2.5 py-1 rounded font-medium text-slate-600 dark:text-slate-400 hover:text-slate-900 transition">12M</button>
+          </div>
+        </div>
+
+        <!-- SVG Line Chart Canvas -->
+        <div class="relative h-56 w-full pt-2">
+          <svg viewBox="0 0 800 200" class="w-full h-full overflow-visible">
+            <defs>
+              <linearGradient id="chartGradient" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stop-color="#2563EB" stop-opacity="0.25"></stop>
+                <stop offset="100%" stop-color="#2563EB" stop-opacity="0.0"></stop>
+              </linearGradient>
+            </defs>
+            <!-- Grid lines -->
+            <line x1="0" y1="40" x2="800" y2="40" stroke="currentColor" class="text-slate-200/70 dark:text-slate-800/60" stroke-dasharray="4 4" />
+            <line x1="0" y1="90" x2="800" y2="90" stroke="currentColor" class="text-slate-200/70 dark:text-slate-800/60" stroke-dasharray="4 4" />
+            <line x1="0" y1="140" x2="800" y2="140" stroke="currentColor" class="text-slate-200/70 dark:text-slate-800/60" stroke-dasharray="4 4" />
+            <line x1="0" y1="190" x2="800" y2="190" stroke="currentColor" class="text-slate-200/70 dark:text-slate-800/60" stroke-dasharray="4 4" />
+
+            <!-- Area fill -->
+            <path id="chartArea" d="M 0,160 Q 150,140 300,110 T 600,60 T 800,30 L 800,200 L 0,200 Z" fill="url(#chartGradient)"></path>
+            
+            <!-- Trend line -->
+            <path id="chartLine" d="M 0,160 Q 150,140 300,110 T 600,60 T 800,30" fill="none" stroke="#2563EB" stroke-width="3" stroke-linecap="round"></path>
+
+            <!-- Peak point -->
+            <circle cx="800" cy="30" r="5" fill="#2563EB" stroke="#ffffff" stroke-width="2" class="dark:stroke-[#0E1322]"></circle>
+          </svg>
+        </div>
+
+        <div class="flex items-center justify-between text-[11px] text-slate-400 font-mono pt-1">
+          <span id="lbl-c-start">Oct 10</span>
+          <span id="lbl-c-m1">Oct 18</span>
+          <span id="lbl-c-m2">Oct 26</span>
+          <span id="lbl-c-m3">Nov 03</span>
+          <span id="lbl-c-end" class="font-bold text-blue-600 dark:text-blue-400">Today ($28,450)</span>
+        </div>
+      </div>
+
+      <!-- ENTERPRISE DATA TABLE (USERS & ROLES) -->
+      <div class="bg-white dark:bg-[#0E1322] border border-slate-200 dark:border-slate-800 rounded-xl shadow-sm overflow-hidden">
+        <!-- Table Toolbar -->
+        <div class="p-4 border-b border-slate-200 dark:border-slate-800 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+          <div>
+            <h3 class="font-bold text-slate-900 dark:text-white text-sm" id="lbl-tbl-title">Members & Access Directory</h3>
+            <p class="text-xs text-slate-500 dark:text-slate-400" id="lbl-tbl-sub">RBAC permissions, assigned SaaS tiers and status.</p>
+          </div>
+
+          <!-- Filters -->
+          <div class="flex flex-wrap items-center gap-2">
+            <!-- Search -->
+            <div class="relative">
+              <i class="fa-solid fa-magnifying-glass absolute left-2.5 top-2.5 text-xs text-slate-400"></i>
+              <input type="text" id="tblSearch" oninput="filterTable()" placeholder="Filter by name, email..." class="pl-8 pr-3 py-1.5 text-xs rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-1 focus:ring-blue-500 w-44 sm:w-56">
+            </div>
+
+            <!-- Role filter -->
+            <select id="roleFilter" onchange="filterTable()" class="px-2.5 py-1.5 text-xs rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 text-slate-700 dark:text-slate-300 focus:outline-none">
+              <option value="ALL">All Roles</option>
+              <option value="Admin">Admin</option>
+              <option value="Manager">Manager</option>
+              <option value="Developer">Developer</option>
+              <option value="Billing">Billing</option>
+            </select>
+
+            <!-- Status filter -->
+            <select id="statusFilter" onchange="filterTable()" class="px-2.5 py-1.5 text-xs rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 text-slate-700 dark:text-slate-300 focus:outline-none">
+              <option value="ALL">All Statuses</option>
+              <option value="Active">Active</option>
+              <option value="Trial">Trial</option>
+              <option value="Past Due">Past Due</option>
+              <option value="Canceled">Canceled</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Table View -->
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-xs border-collapse">
+            <thead>
+              <tr class="bg-slate-50/75 dark:bg-slate-900/60 border-b border-slate-200 dark:border-slate-800 font-semibold text-slate-500 dark:text-slate-400">
+                <th class="py-3 px-4" id="th-user">User</th>
+                <th class="py-3 px-4" id="th-role">Role (RBAC)</th>
+                <th class="py-3 px-4" id="th-plan">SaaS Plan</th>
+                <th class="py-3 px-4" id="th-mrr">MRR Value</th>
+                <th class="py-3 px-4" id="th-status">Status</th>
+                <th class="py-3 px-4" id="th-active">Last Active</th>
+                <th class="py-3 px-4 text-right" id="th-actions">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="tblBody" class="divide-y divide-slate-200 dark:divide-slate-800/80">
+              <!-- Rendered via JS -->
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Table Footer / Pagination -->
+        <div class="p-3 border-t border-slate-200 dark:border-slate-800 flex items-center justify-between text-xs text-slate-500">
+          <span id="lbl-tbl-count">Showing 6 of 1,842 members</span>
+          <div class="flex items-center space-x-1">
+            <button class="px-2 py-1 rounded border border-slate-200 dark:border-slate-800 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-400 cursor-not-allowed">Previous</button>
+            <button class="px-2 py-1 rounded bg-blue-50 text-blue-600 font-bold dark:bg-blue-950 dark:text-blue-300">1</button>
+            <button class="px-2 py-1 rounded border border-slate-200 dark:border-slate-800 hover:bg-slate-100 dark:hover:bg-slate-800">2</button>
+            <button class="px-2 py-1 rounded border border-slate-200 dark:border-slate-800 hover:bg-slate-100 dark:hover:bg-slate-800">Next</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- STRIPE MONETIZATION & COMMERCIAL STOREFRONT -->
+      <div id="commercial-license" class="p-6 rounded-2xl bg-gradient-to-b from-white to-slate-50 dark:from-[#0E1322] dark:to-[#0B0F19] border border-blue-200/80 dark:border-blue-900/40 shadow-md space-y-6">
+        <div class="text-center max-w-2xl mx-auto space-y-2">
+          <span class="text-xs font-bold uppercase tracking-wider text-blue-600 dark:text-blue-400" id="lbl-com-tag">Commercial Deployment License</span>
+          <h2 class="text-2xl font-black text-slate-900 dark:text-white tracking-tight" id="lbl-com-title">Build & Sell Your Enterprise Admin SaaS</h2>
+          <p class="text-xs text-slate-600 dark:text-slate-300 leading-relaxed" id="lbl-com-desc">
+            Save 120+ engineering hours. Get the complete Next.js 15 App Router code with Mantine/Radix tokens, Prisma ORM, Stripe webhook automation, and instant private GitHub access.
+          </p>
+        </div>
+
+        <!-- Comparison Table -->
+        <div class="overflow-x-auto">
+          <table class="w-full text-xs text-left border-collapse border border-slate-200 dark:border-slate-800 rounded-xl overflow-hidden bg-white dark:bg-slate-900/60">
+            <thead>
+              <tr class="bg-slate-100/70 dark:bg-slate-800/80 border-b border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 font-bold">
+                <th class="p-3" id="th-feature">Architecture Feature</th>
+                <th class="p-3 text-center" id="th-demo">Public GitHub Demo</th>
+                <th class="p-3 text-center bg-blue-50/50 dark:bg-blue-950/20 text-blue-600 dark:text-blue-300 font-extrabold" id="th-prod">Commercial Full-Stack License ($59)</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-200 dark:divide-slate-800 text-slate-600 dark:text-slate-300">
+              <tr>
+                <td class="p-3 font-semibold" id="feat-1">Design System & Mantine/Radix Styling</td>
+                <td class="p-3 text-center text-emerald-600"><i class="fa-solid fa-check"></i></td>
+                <td class="p-3 text-center font-bold text-emerald-600 bg-blue-50/20 dark:bg-blue-950/10"><i class="fa-solid fa-check"></i> Enterprise Modular</td>
+              </tr>
+              <tr>
+                <td class="p-3 font-semibold" id="feat-2">Next.js 15 App Router Full Source</td>
+                <td class="p-3 text-center text-slate-400"><i class="fa-solid fa-xmark"></i> (Demo Only)</td>
+                <td class="p-3 text-center font-bold text-emerald-600 bg-blue-50/20 dark:bg-blue-950/10"><i class="fa-solid fa-check"></i> Complete /src & /app</td>
+              </tr>
+              <tr>
+                <td class="p-3 font-semibold" id="feat-3">Prisma ORM Multi-Role RBAC Schema</td>
+                <td class="p-3 text-center text-slate-400"><i class="fa-solid fa-xmark"></i></td>
+                <td class="p-3 text-center font-bold text-emerald-600 bg-blue-50/20 dark:bg-blue-950/10"><i class="fa-solid fa-check"></i> schema.prisma + Migrations</td>
+              </tr>
+              <tr>
+                <td class="p-3 font-semibold" id="feat-4">Stripe Billing & Webhook Dispatcher</td>
+                <td class="p-3 text-center text-slate-400"><i class="fa-solid fa-xmark"></i> (Simulation)</td>
+                <td class="p-3 text-center font-bold text-emerald-600 bg-blue-50/20 dark:bg-blue-950/10"><i class="fa-solid fa-check"></i> Ready-to-deploy Routes</td>
+              </tr>
+              <tr>
+                <td class="p-3 font-semibold" id="feat-5">Commercial Rights & Private Repo Access</td>
+                <td class="p-3 text-center text-slate-400"><i class="fa-solid fa-xmark"></i> Evaluation Only</td>
+                <td class="p-3 text-center font-bold text-emerald-600 bg-blue-50/20 dark:bg-blue-950/10"><i class="fa-solid fa-check"></i> Unlimited Client SaaS</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2">
+          <a href="https://github.com/KipTecnologia/dashcraft-pro" class="w-full sm:w-auto px-5 py-2.5 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200 text-xs font-bold text-center hover:bg-slate-50 transition">
+            <i class="fa-brands fa-github mr-1.5"></i> Star on GitHub
+          </a>
+          <button onclick="simulateCheckout()" class="w-full sm:w-auto px-6 py-2.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold text-center shadow-lg shadow-blue-500/25 transition">
+            <i class="fa-solid fa-bolt mr-1.5"></i> <span id="btn-buy-bottom">Buy Commercial Boilerplate ($59)</span>
+          </button>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- COMMAND PALETTE MODAL (⌘K) -->
+  <div id="cmdModal" class="fixed inset-0 z-50 bg-slate-900/50 backdrop-blur-sm hidden flex items-start justify-center pt-24 px-4">
+    <div class="bg-white dark:bg-[#0E1322] border border-slate-200 dark:border-slate-800 rounded-xl shadow-2xl max-w-lg w-full overflow-hidden">
+      <div class="p-3 border-b border-slate-200 dark:border-slate-800 flex items-center space-x-2.5">
+        <i class="fa-solid fa-magnifying-glass text-slate-400 text-sm"></i>
+        <input type="text" id="cmdInput" placeholder="Type a command or search..." class="w-full text-xs bg-transparent focus:outline-none text-slate-800 dark:text-slate-100">
+        <button onclick="toggleCommandPalette()" class="text-xs text-slate-400 hover:text-slate-600 font-mono">ESC</button>
+      </div>
+      <div class="p-2 text-xs space-y-1">
+        <div class="text-[10px] font-bold uppercase tracking-wider text-slate-400 px-2 py-1">Quick Actions</div>
+        <button onclick="toggleTheme(); toggleCommandPalette();" class="w-full text-left px-2.5 py-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800/80 flex items-center justify-between text-slate-700 dark:text-slate-300">
+          <span><i class="fa-solid fa-circle-half-stroke mr-2 text-blue-500"></i> Toggle Light/Dark Theme</span>
+          <kbd class="text-[10px] text-slate-400">T</kbd>
+        </button>
+        <button onclick="toggleLanguage(); toggleCommandPalette();" class="w-full text-left px-2.5 py-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800/80 flex items-center justify-between text-slate-700 dark:text-slate-300">
+          <span><i class="fa-solid fa-language mr-2 text-emerald-500"></i> Switch Language (EN / PT)</span>
+          <kbd class="text-[10px] text-slate-400">L</kbd>
+        </button>
+        <button onclick="exportTableToCSV(); toggleCommandPalette();" class="w-full text-left px-2.5 py-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800/80 flex items-center justify-between text-slate-700 dark:text-slate-300">
+          <span><i class="fa-solid fa-download mr-2 text-purple-500"></i> Download CSV User Report</span>
+          <kbd class="text-[10px] text-slate-400">E</kbd>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- JAVASCRIPT LOGIC & BILINGUAL ENGINE -->
+  <script>
+    // State
+    let currentLang = 'en';
+    let isDark = false;
+
+    // Database Mock (Members & RBAC)
+    const membersData = {
+      en: [
+        { id: 'usr_01', name: 'Alex Rivera', email: 'alex.rivera@acme.inc', role: 'Admin', plan: 'Enterprise SaaS', mrr: '$199', status: 'Active', active: 'Just now', avatar: 'AR' },
+        { id: 'usr_02', name: 'Sarah Chen', email: 'sarah.c@fintech.io', role: 'Developer', plan: 'Growth Tier', mrr: '$79', status: 'Active', active: '12m ago', avatar: 'SC' },
+        { id: 'usr_03', name: 'Marcus Brody', email: 'marcus@brodyanalytics.com', role: 'Manager', plan: 'Enterprise SaaS', mrr: '$199', status: 'Trial', active: '45m ago', avatar: 'MB' },
+        { id: 'usr_04', name: 'Elena Rostova', email: 'elena@novacapital.de', role: 'Billing', plan: 'Growth Tier', mrr: '$79', status: 'Active', active: '2h ago', avatar: 'ER' },
+        { id: 'usr_05', name: 'David Kim', email: 'david.kim@seoultech.kr', role: 'Developer', plan: 'Starter Tier', mrr: '$29', status: 'Past Due', active: '1d ago', avatar: 'DK' },
+        { id: 'usr_06', name: 'Chloe Vance', email: 'chloe@vancestudio.design', role: 'Manager', plan: 'Starter Tier', mrr: '$29', status: 'Canceled', active: '3d ago', avatar: 'CV' }
+      ],
+      pt: [
+        { id: 'usr_01', name: 'Carlos Henrique', email: 'carlos.h@empresa.com.br', role: 'Admin', plan: 'SaaS Empresarial', mrr: 'R$ 995', status: 'Ativo', active: 'Agora mesmo', avatar: 'CH' },
+        { id: 'usr_02', name: 'Juliana Mendes', email: 'juliana.m@fintech.com.br', role: 'Desenvolvedor', plan: 'Plano Crescimento', mrr: 'R$ 395', status: 'Ativo', active: 'Há 12 min', avatar: 'JM' },
+        { id: 'usr_03', name: 'Marcos Silveira', email: 'marcos@silveira.io', role: 'Gestor', plan: 'SaaS Empresarial', mrr: 'R$ 995', status: 'Avaliação', active: 'Há 45 min', avatar: 'MS' },
+        { id: 'usr_04', name: 'Helena Rocha', email: 'helena@capital.com.br', role: 'Faturamento', plan: 'Plano Crescimento', mrr: 'R$ 395', status: 'Ativo', active: 'Há 2h', avatar: 'HR' },
+        { id: 'usr_05', name: 'Diego Barbosa', email: 'diego@techbras.com.br', role: 'Desenvolvedor', plan: 'Plano Inicial', mrr: 'R$ 145', status: 'Atrasado', active: 'Ontem', avatar: 'DB' },
+        { id: 'usr_06', name: 'Camila Vasconcelos', email: 'camila@estudio.design', role: 'Gestor', plan: 'Plano Inicial', mrr: 'R$ 145', status: 'Cancelado', active: 'Há 3 dias', avatar: 'CV' }
+      ]
+    };
+
+    const dictionary = {
+      en: {
+        langLabel: 'English',
+        workspace: 'Production Workspace',
+        searchPlaceholder: 'Quick search users, metrics or settings...',
+        buyTop: 'Commercial License ($59)',
+        navMain: 'Main Menu',
+        overview: 'Overview',
+        users: 'Users & Roles',
+        billing: 'Stripe Billing',
+        audit: 'Audit & Security',
+        settings: 'Settings',
+        sysHealth: 'System Status',
+        sysDesc: 'Prisma DB, Stripe webhooks and Next.js 15 API routes nominal.',
+        cardTitle: 'Production Source Code',
+        cardDesc: 'Get the private Next.js 15, Prisma schemas, Stripe webhook handlers, and full RBAC code.',
+        cardBtn: 'Buy License ($59)',
+        pageTitle: 'Executive SaaS & Operations Dashboard',
+        pageDesc: 'Real-time revenue analytics, team roles, and subscription lifecycle management.',
+        exportCsv: 'Export CSV',
+        inviteMember: 'Invite Member',
+        mrrTitle: 'Monthly Recurring Revenue',
+        mrrVal: '$28,450',
+        vsLastMonth: 'vs last month',
+        arrTitle: 'Annual Run Rate (ARR)',
+        arrVal: '$341,400',
+        vsLastYear: 'YoY growth',
+        subsTitle: 'Active Subscriptions',
+        subsVal: '1,842',
+        netExpansion: 'net expansion',
+        churnTitle: 'Customer Churn Rate',
+        churnVal: '0.85%',
+        industryLow: 'industry benchmark',
+        chartTitle: 'MRR Trajectory & Net Volume',
+        chartSub: 'Direct Stripe checkout and recurring webhook telemetry.',
+        tblTitle: 'Members & Access Directory',
+        tblSub: 'RBAC permissions, assigned SaaS tiers and status.',
+        thUser: 'User',
+        thRole: 'Role (RBAC)',
+        thPlan: 'SaaS Plan',
+        thMrr: 'MRR Value',
+        thStatus: 'Status',
+        thActive: 'Last Active',
+        thActions: 'Actions',
+        tblCount: 'Showing 6 of 1,842 members',
+        comTag: 'Commercial Deployment License',
+        comTitle: 'Build & Sell Your Enterprise Admin SaaS',
+        comDesc: 'Save 120+ engineering hours. Get the complete Next.js 15 App Router code with Mantine/Radix tokens, Prisma ORM, Stripe webhook automation, and instant private GitHub access.',
+        thFeature: 'Architecture Feature',
+        thDemo: 'Public GitHub Demo',
+        thProd: 'Commercial Full-Stack License ($59)',
+        feat1: 'Design System & Mantine/Radix Styling',
+        feat2: 'Next.js 15 App Router Full Source',
+        feat3: 'Prisma ORM Multi-Role RBAC Schema',
+        feat4: 'Stripe Billing & Webhook Dispatcher',
+        feat5: 'Commercial Rights & Private Repo Access',
+        buyBottom: 'Buy Commercial Boilerplate ($59)'
+      },
+      pt: {
+        langLabel: 'Português',
+        workspace: 'Ambiente de Produção',
+        searchPlaceholder: 'Buscar usuários, métricas ou configurações...',
+        buyTop: 'Licença Comercial (R$ 297)',
+        navMain: 'Menu Principal',
+        overview: 'Visão Geral',
+        users: 'Usuários & Cargos',
+        billing: 'Faturamento Stripe',
+        audit: 'Auditoria & Segurança',
+        settings: 'Configurações',
+        sysHealth: 'Status do Sistema',
+        sysDesc: 'Banco Prisma, webhooks Stripe e rotas Next.js 15 operando nominalmente.',
+        cardTitle: 'Código-Fonte de Produção',
+        cardDesc: 'Acesse o código Next.js 15 privado com Prisma, Stripe webhooks e RBAC completo.',
+        cardBtn: 'Comprar Licença (R$ 297)',
+        pageTitle: 'Painel Executivo de SaaS & Operações',
+        pageDesc: 'Análise de receita em tempo real, controle de cargos e ciclo de vida de assinaturas.',
+        exportCsv: 'Exportar CSV',
+        inviteMember: 'Convidar Membro',
+        mrrTitle: 'Receita Recorrente Mensal (MRR)',
+        mrrVal: 'R$ 142.250',
+        vsLastMonth: 'vs mês anterior',
+        arrTitle: 'Projeção Anual (ARR)',
+        arrVal: 'R$ 1.707.000',
+        vsLastYear: 'crescimento anual',
+        subsTitle: 'Assinaturas Ativas',
+        subsVal: '1.842',
+        netExpansion: 'expansão líquida',
+        churnTitle: 'Taxa de Churn',
+        churnVal: '0.85%',
+        industryLow: 'referência do mercado',
+        chartTitle: 'Trajetória de MRR & Volume Líquido',
+        chartSub: 'Telemetria direta de pagamentos e webhooks do Stripe.',
+        tblTitle: 'Diretório de Membros & Permissões',
+        tblSub: 'Controle de acesso RBAC, planos SaaS vinculados e status.',
+        thUser: 'Usuário',
+        thRole: 'Cargo (RBAC)',
+        thPlan: 'Plano SaaS',
+        thMrr: 'Valor MRR',
+        thStatus: 'Status',
+        thActive: 'Último Acesso',
+        thActions: 'Ações',
+        tblCount: 'Exibindo 6 de 1.842 membros',
+        comTag: 'Licença Comercial de Produção',
+        comTitle: 'Crie e Venda Seu Próprio SaaS Enterprise',
+        comDesc: 'Economize 120+ horas de engenharia. Receba o código completo Next.js 15 com Mantine/Radix, Prisma ORM, webhooks Stripe e acesso imediato ao GitHub privado.',
+        thFeature: 'Recurso de Engenharia',
+        thDemo: 'Demonstração Pública GitHub',
+        thProd: 'Licença Comercial Full-Stack (R$ 297)',
+        feat1: 'Design System & Estilização Mantine/Radix',
+        feat2: 'Código Completo Next.js 15 App Router',
+        feat3: 'Schema Prisma ORM com Cargos e RBAC',
+        feat4: 'Integração de Faturamento e Webhooks Stripe',
+        feat5: 'Direitos Comerciais e Repositório Privado',
+        buyBottom: 'Garantir Boilerplate Comercial (R$ 297)'
+      }
+    };
+
+    function applyLanguage(lang) {
+      currentLang = lang;
+      const d = dictionary[lang];
+      document.getElementById('lang-btn').innerHTML = lang === 'en' ? '<span>🇺🇸</span> <span>English</span>' : '<span>🇧🇷</span> <span>Português</span>';
+      
+      const setText = (id, val) => {
+        const el = document.getElementById(id);
+        if (el) el.innerText = val;
+      };
+
+      setText('txt-workspace-label', d.workspace);
+      document.getElementById('txt-search-placeholder').innerText = d.searchPlaceholder;
+      setText('lbl-buy-top', d.buyTop);
+      setText('lbl-nav-main', d.navMain);
+      setText('lbl-menu-overview', d.overview);
+      setText('lbl-menu-users', d.users);
+      setText('lbl-menu-billing', d.billing);
+      setText('lbl-menu-audit', d.audit);
+      setText('lbl-menu-settings', d.settings);
+      setText('lbl-system-health', d.sysHealth);
+      setText('lbl-system-desc', d.sysDesc);
+      setText('lbl-card-title', d.cardTitle);
+      setText('lbl-card-desc', d.cardDesc);
+      setText('lbl-card-btn', d.cardBtn);
+      setText('lbl-page-title', d.pageTitle);
+      setText('lbl-page-desc', d.pageDesc);
+      setText('btn-export-csv', d.exportCsv);
+      setText('btn-invite-member', d.inviteMember);
+      setText('lbl-mrr-title', d.mrrTitle);
+      setText('lbl-mrr-val', d.mrrVal);
+      setText('lbl-vs-last-month', d.vsLastMonth);
+      setText('lbl-arr-title', d.arrTitle);
+      setText('lbl-arr-val', d.arrVal);
+      setText('lbl-vs-last-year', d.vsLastYear);
+      setText('lbl-subs-title', d.subsTitle);
+      setText('lbl-subs-val', d.subsVal);
+      setText('lbl-net-expansion', d.netExpansion);
+      setText('lbl-churn-title', d.churnTitle);
+      setText('lbl-churn-val', d.churnVal);
+      setText('lbl-industry-low', d.industryLow);
+      setText('lbl-chart-title', d.chartTitle);
+      setText('lbl-chart-subtitle', d.chartSub);
+      setText('lbl-tbl-title', d.tblTitle);
+      setText('lbl-tbl-sub', d.tblSub);
+      setText('th-user', d.thUser);
+      setText('th-role', d.thRole);
+      setText('th-plan', d.thPlan);
+      setText('th-mrr', d.thMrr);
+      setText('th-status', d.thStatus);
+      setText('th-active', d.thActive);
+      setText('th-actions', d.thActions);
+      setText('lbl-tbl-count', d.tblCount);
+      setText('lbl-com-tag', d.comTag);
+      setText('lbl-com-title', d.comTitle);
+      setText('lbl-com-desc', d.comDesc);
+      setText('th-feature', d.thFeature);
+      setText('th-demo', d.thDemo);
+      setText('th-prod', d.thProd);
+      setText('feat-1', d.feat1);
+      setText('feat-2', d.feat2);
+      setText('feat-3', d.feat3);
+      setText('feat-4', d.feat4);
+      setText('feat-5', d.feat5);
+      setText('btn-buy-bottom', d.buyBottom);
+
+      renderTable();
+    }
+
+    function toggleLanguage() {
+      applyLanguage(currentLang === 'en' ? 'pt' : 'en');
+    }
+
+    function toggleTheme() {
+      isDark = !isDark;
+      const html = document.documentElement;
+      const icon = document.getElementById('theme-icon');
+      if (isDark) {
+        html.classList.remove('light');
+        html.classList.add('dark');
+        icon.className = 'fa-solid fa-sun text-xs text-amber-400';
+      } else {
+        html.classList.remove('dark');
+        html.classList.add('light');
+        icon.className = 'fa-solid fa-moon text-xs';
+      }
+    }
+
+    // Table Rendering & Filters
+    function renderTable() {
+      const tbody = document.getElementById('tblBody');
+      const data = membersData[currentLang] || membersData.en;
+      const search = (document.getElementById('tblSearch').value || '').toLowerCase();
+      const role = document.getElementById('roleFilter').value;
+      const status = document.getElementById('statusFilter').value;
+
+      const filtered = data.filter(m => {
+        const matchSearch = m.name.toLowerCase().includes(search) || m.email.toLowerCase().includes(search);
+        const matchRole = role === 'ALL' || m.role.toLowerCase() === role.toLowerCase();
+        const matchStatus = status === 'ALL' || m.status.toLowerCase() === status.toLowerCase();
+        return matchSearch && matchRole && matchStatus;
+      });
+
+      tbody.innerHTML = filtered.map(m => {
+        let badgeColor = 'bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300';
+        if (m.role === 'Admin') badgeColor = 'bg-blue-50 text-blue-700 dark:bg-blue-950/80 dark:text-blue-300 border border-blue-200 dark:border-blue-800/40';
+        else if (m.role === 'Manager' || m.role === 'Gestor') badgeColor = 'bg-purple-50 text-purple-700 dark:bg-purple-950/80 dark:text-purple-300 border border-purple-200 dark:border-purple-800/40';
+        else if (m.role === 'Developer' || m.role === 'Desenvolvedor') badgeColor = 'bg-amber-50 text-amber-700 dark:bg-amber-950/80 dark:text-amber-300 border border-amber-200 dark:border-amber-800/40';
+        else if (m.role === 'Billing' || m.role === 'Faturamento') badgeColor = 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/80 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800/40';
+
+        let statusDot = 'badge-active text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/40';
+        if (m.status === 'Past Due' || m.status === 'Atrasado') statusDot = 'badge-pastdue text-rose-700 dark:text-rose-400 bg-rose-50 dark:bg-rose-950/40';
+        else if (m.status === 'Trial' || m.status === 'Avaliação') statusDot = 'badge-trial text-blue-700 dark:text-blue-400 bg-blue-50 dark:bg-blue-950/40';
+        else if (m.status === 'Canceled' || m.status === 'Cancelado') statusDot = 'badge-canceled text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-slate-800';
+
+        return `
+          <tr class="hover:bg-slate-50/80 dark:hover:bg-slate-800/40 transition">
+            <td class="py-3 px-4">
+              <div class="flex items-center space-x-2.5">
+                <div class="w-7 h-7 rounded-full bg-slate-200 dark:bg-slate-700 flex items-center justify-center font-bold text-[10px] text-slate-700 dark:text-slate-200">
+                  ${m.avatar}
+                </div>
+                <div>
+                  <div class="font-bold text-slate-900 dark:text-white">${m.name}</div>
+                  <div class="text-[11px] text-slate-500 dark:text-slate-400">${m.email}</div>
+                </div>
+              </div>
+            </td>
+            <td class="py-3 px-4">
+              <span class="inline-block px-2 py-0.5 rounded text-[11px] font-semibold ${badgeColor}">
+                ${m.role}
+              </span>
+            </td>
+            <td class="py-3 px-4 text-slate-700 dark:text-slate-300 font-medium">${m.plan}</td>
+            <td class="py-3 px-4 font-mono font-bold text-slate-900 dark:text-white">${m.mrr}</td>
+            <td class="py-3 px-4">
+              <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-semibold badge-dot ${statusDot}">
+                ${m.status}
+              </span>
+            </td>
+            <td class="py-3 px-4 text-slate-500 dark:text-slate-400">${m.active}</td>
+            <td class="py-3 px-4 text-right">
+              <button onclick="alert('Simulation: RBAC & Stripe details modal opened for ${m.name}')" class="p-1 rounded text-slate-400 hover:text-slate-600 dark:hover:text-slate-200">
+                <i class="fa-solid fa-ellipsis"></i>
+              </button>
+            </td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    function filterTable() {
+      renderTable();
+    }
+
+    // Real CSV Export
+    function exportTableToCSV() {
+      const data = membersData[currentLang] || membersData.en;
+      let csv = "ID,Name,Email,Role,Plan,MRR,Status,LastActive\n";
+      data.forEach(m => {
+        csv += `"${m.id}","${m.name}","${m.email}","${m.role}","${m.plan}","${m.mrr}","${m.status}","${m.active}"\n`;
+      });
+      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.setAttribute("href", url);
+      a.setAttribute("download", `dashcraft_members_${currentLang}.csv`);
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+    }
+
+    // Command Palette
+    function toggleCommandPalette() {
+      const modal = document.getElementById('cmdModal');
+      modal.classList.toggle('hidden');
+      if (!modal.classList.contains('hidden')) {
+        setTimeout(() => document.getElementById('cmdInput').focus(), 50);
+      }
+    }
+
+    window.addEventListener('keydown', (e) => {
+      if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+        e.preventDefault();
+        toggleCommandPalette();
+      } else if (e.key === 'Escape') {
+        const modal = document.getElementById('cmdModal');
+        if (!modal.classList.contains('hidden')) modal.classList.add('hidden');
+      }
+    });
+
+    // Time Range selector
+    function setRange(range) {
+      ['7D', '30D', '90D', '12M'].forEach(r => {
+        const b = document.getElementById('btn-r-' + r);
+        if (r === range) {
+          b.className = 'px-2.5 py-1 rounded font-bold bg-white dark:bg-slate-800 text-blue-600 dark:text-blue-400 shadow-sm transition';
+        } else {
+          b.className = 'px-2.5 py-1 rounded font-medium text-slate-600 dark:text-slate-400 hover:text-slate-900 transition';
+        }
+      });
+    }
+
+    function simulateInvite() {
+      const email = prompt(currentLang === 'pt' ? 'Digite o e-mail do novo membro para enviar o convite:' : 'Enter the new member email to send the invite:');
+      if (email) alert(currentLang === 'pt' ? `Convite com permissão padrão enviado para ${email}!` : `Invite sent to ${email} with default role!`);
+    }
+
+    function simulateCheckout() {
+      alert(currentLang === 'pt' ? 'Simulação de Checkout: Redirecionando para Stripe Checkout oficial da Kip Tecnologia...' : 'Simulation Checkout: Redirecting to official Kip Tecnologia Stripe Checkout...');
+    }
+
+    // Initialize in clean Light Mode by default
+    applyLanguage('en');
+  </script>
+</body>
+</html>
